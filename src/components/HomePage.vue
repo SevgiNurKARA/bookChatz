@@ -20,7 +20,7 @@
         <p>Your about content here...</p>
       </section>
       <section class="post">
-        <router-link to="/create">Create a Post</router-link>
+        <router-link to="/posts/new-post">Create a Post</router-link>
         <h2>Latest Post</h2>
         <p>Your post content here...</p>
       </section>
@@ -42,7 +42,7 @@ export default {
       this.showUserMenu = !this.showUserMenu;
     },
     logout() {
-      this.$router.push('/login');
+      this.$router.push('/users/login');
       this.showUserMenu = false;
     }
   }
