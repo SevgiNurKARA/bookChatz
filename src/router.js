@@ -4,7 +4,7 @@ import HomePage from './components/HomePage.vue';
 import PostCreation from './components/PostCreation.vue';
 import Login from './components/Log-in.vue';
 import UserRegister from './components/UserRegister.vue';
-
+import ProfilePage from './components/ProfilPage.vue';
 
 const routes = [
   { path: '/landing', component: LandingPage },
@@ -12,6 +12,7 @@ const routes = [
   { path: '/posts/new-post',name: 'CreatePost', component: PostCreation },
   { path: '/users/login', name: 'Login', component: Login },
   { path: '/users/register', name: 'Register', component: UserRegister },
+  { path: '/profile', name: 'Profile',  component: ProfilePage }
   
   // Add other routes here
 ];

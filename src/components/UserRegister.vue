@@ -60,22 +60,34 @@ export default {
       message: ''
     };
   },
-  created() {
-    this.loadAvatar();
-  },
+
   methods: {
-    selectAvatar(index) {
-      this.selectedAvatar = this.avatars[index];
-      let sourceUrl= this.avatars[index].src;
-      localStorage.setItem('selectedAvatar', JSON.stringify(sourceUrl));
-      this.form.photoUrl = this.selectedAvatar.src; // Form data'ya avatar URL'sini ekliyoruz
-    },
-    loadAvatar() {
-      const savedAvatar = localStorage.getItem('selectedAvatar');
-      if (savedAvatar) {
-        this.selectedAvatar = JSON.parse(savedAvatar);
+     
+  selectAvatar(index) {
+    this.selectedAvatar = this.avatars[index];
+    let sourceUrl = this.avatars[index].src;
+    localStorage.setItem('userAvatar', sourceUrl);
+    this.form.photoUrl = sourceUrl;
+  },
+  
+  register() {
+    if (this.form.email && this.form.password && this.selectedAvatar) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(this.form.email)) {
+        alert("Please enter a valid email address.");
+        return;
       }
-    },
+      
+      localStorage.setItem('userEmail', this.form.email);
+      localStorage.setItem('userPassword', this.form.password);
+      localStorage.setItem('fullname', this.form.fullname);
+      localStorage.setItem('userAvatar', this.selectedAvatar.src);
+      
+      this.$router.push('/');
+    } else {
+      alert("Email, password, and avatar selection are required.");
+    }
+  }
     /*async submitForm() {
       try {
         const response = await axios.post('http://localhost:8080/users/register', this.form);
@@ -85,25 +97,7 @@ export default {
         this.message = 'Error submitting form: ' + error.message;
       }
     },*/
-    register() {
-  if (this.form.email && this.form.password) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(this.form.email)) {
-      alert("Geçerli bir e-posta adresi girin.");
-      return;
-    }
-    // Store the values in localStorage
-    localStorage.setItem('userEmail', this.form.email);
-    localStorage.setItem('userPassword', this.form.password);
-    localStorage.setItem('fullname', this.form.fullname);
-    
-   // this.submitForm();
-  }
-  else {
-    alert("E-posta ve şifre boş bırakılamaz.");
-  }
-  this.$router.push('/');
-}
+   
   }
   };
 </script>

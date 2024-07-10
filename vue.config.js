@@ -8,7 +8,7 @@ const path = require('path');
 module.exports = {
   chainWebpack: config => {
     config.resolve.alias
-      .set('@store', path.resolve(__dirname, 'src/store'));
-    // Diğer alias tanımlamaları buraya eklenebilir
-  }
-};
+    '@'; path.resolve(__dirname, 'src/')
+    // Diğer alias tanımlamaları buraya eklenebili
+  },
+  };

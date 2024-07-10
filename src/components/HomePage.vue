@@ -33,15 +33,33 @@ export default {
   name: 'HomePage',
   data() {
     return {
-      userAvatar: '@/assets/logo.png',
+      userAvatar: '',
       showUserMenu: false
     };
   },
+  created() {
+    this.loadUserAvatar();
+  },
   methods: {
+    loadUserAvatar() {
+      const savedAvatar = localStorage.getItem('userAvatar');
+      if (savedAvatar) {
+        this.userAvatar = savedAvatar;
+      } else {
+        // Set a default avatar if none is found
+        this.userAvatar = '@/assets/default-avatar.png';
+      }
+    },
     toggleUserMenu() {
       this.showUserMenu = !this.showUserMenu;
     },
     logout() {
+      // Clear user data from localStorage
+      localStorage.removeItem('userEmail');
+      localStorage.removeItem('userPassword');
+      localStorage.removeItem('fullname');
+      localStorage.removeItem('userAvatar');
+      
       this.$router.push('/users/login');
       this.showUserMenu = false;
     }
