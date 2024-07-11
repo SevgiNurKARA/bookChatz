@@ -27,7 +27,7 @@
               <img :src="post.bookCover" alt="Book Cover" class="book-cover">
               <div>
                 <p><strong>Author:</strong> {{ post.bookAuthor }}</p>
-                <p><strong>Genre:</strong> {{ post.bookGenre }}</p>
+                <p><strong>Genre:</strong> {{ post.bookType }}</p>
               </div>
             </div>
             <div class="review">
@@ -84,7 +84,7 @@ export default {
           userName: '',
           bookName: 'The Life Of Prophet Muhammed(s.a.v)',
           bookAuthor: 'Martin LİNGS',
-          bookGenre: 'RELIGION',
+          bookType: 'RELIGION',
           bookCover: 'https://1.bp.blogspot.com/_GNxGuhDeops/RvTFbWihxQI/AAAAAAAAAA8/-yeu8KLDBhw/s1600/ingtr.bmp',
           review: `"1984" is a chilling portrayal of a totalitarian future where critical thought is suppressed under a surveillance state. Orwell's masterpiece remains eerily relevant today, serving as a stark warning about the dangers of totalitarianism, surveillance, and the manipulation of truth. The novel's exploration of themes like doublethink, newspeak, and the erosion of personal freedom resonates deeply in our current digital age. Winston Smith's struggle against the omnipresent Big Brother is a powerful reminder of the importance of individual liberty and the courage to maintain one's humanity in the face of oppression. This book is not just a classic of dystopian literature, but a crucial lens through which to view our own society's relationship with power, truth, and freedom.`,
           showFullReview: false,
@@ -98,7 +98,7 @@ export default {
           userName: '',
           bookName: 'The Surgeon',
           bookAuthor: 'Tess GERRITSEN',
-          bookGenre: 'THRILLER',
+          bookType: 'THRILLER',
           bookCover: 'https://m.media-amazon.com/images/I/81X2W7kBNjL._SX342_.jpg',
           review: `He slips into homes at night and walks silently into bedrooms where women lie sleeping, about to awaken to a living 
           nightmare. The precision of his methods suggests that he is a deranged man of medicine, prompting the Boston newspapers to dub him
@@ -118,7 +118,7 @@ export default {
           userName: '',
           bookName: 'The Bloodstream',
           bookAuthor: 'Tess GERRİTSEN',
-          bookGenre: 'HORROR',
+          bookType: 'HORROR',
           bookCover: 'https://m.media-amazon.com/images/I/81IoUHDbGOL._AC_UY218_.jpg',
           review: `Tess Gerritsen again weaves frighteningly realistic medical detail into heart-stopping suspense, as a small-town doctor races to unravel the roots of a violent epidemic - before it destroys everything she loves.
 
