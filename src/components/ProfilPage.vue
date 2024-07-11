@@ -1,4 +1,5 @@
 <template>
+  <div class = "whole-page">
   <div class="profile-page">
     <h1>User Profile</h1>
     <div class="profile-content">
@@ -30,6 +31,7 @@
       </div>
     </div>
   </div>
+</div>
 </template>
 
 <script>
@@ -92,11 +94,19 @@ export default {
 </script>
 
 <style scoped>
+.whole-page{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: #6F4E37;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
 .profile-page {
-  max-width: 800px;
+  width: 800px;
   margin: 0 auto;
   padding: 20px;
-  background-color: #f9f9f9;
+  background-color: #A67B5B;
   border-radius: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   font-family: Arial, sans-serif;
@@ -104,7 +114,7 @@ export default {
 
 .profile-page h1 {
   text-align: center;
-  color: #333;
+  color: #070707;
   margin-bottom: 20px;
 }
 
@@ -159,7 +169,7 @@ export default {
 label {
   display: block;
   margin-bottom: 8px;
-  color: #555;
+  color: #131212;
   font-weight: bold;
 }
 
