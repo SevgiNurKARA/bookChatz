@@ -4,6 +4,10 @@
       <div class="logo">
         <img src="@/assets/bookChatz.jpg" alt="Logo">
       </div>
+      <div class="header-actions">
+        <button class="create-post-btn" @click="navigateToCreatePost">
+          <i class="fas fa-plus"></i> Create New Post
+        </button>
       <div class="user-avatar" @click="toggleUserMenu">
         <img :src="userAvatar" alt="User Avatar">
         <transition name="fade">
@@ -13,6 +17,7 @@
           </div>
         </transition>
       </div>
+    </div>
     </header>
     <main class="main-content">
       <div class="posts-section">
@@ -173,6 +178,9 @@ Shaken by accusations, and fearful that Noah is now at risk, Claire desperately 
     toggleUserMenu() {
       this.showUserMenu = !this.showUserMenu;
     },
+    navigateToCreatePost() {
+      this.$router.push('/posts/new-post')
+    },
     logout() {
       localStorage.removeItem('userEmail');
       localStorage.removeItem('userPassword');
@@ -204,6 +212,32 @@ header {
   position: relative;
   z-index: 1000;
 }
+.header-actions {
+  display: flex;
+  align-items: center;
+}
+
+.create-post-btn {
+  margin-right: 20px;
+  padding: 10px 15px;
+  background-color: #2d7ee7;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+}
+
+.create-post-btn i {
+  margin-right: 5px;
+}
+
+.create-post-btn:hover {
+  background-color: #1c6ad4;
+}
+
 
 .logo img {
   height: 50px;
