@@ -1,11 +1,11 @@
 <template>
-    <div v-if="showPreview" class="post-preview">
+  <div v-if="showPreview" class="post-preview">
     <h2>Preview Your Post</h2>
     <div class="preview-content">
       <img :src="post.bookPhotoUrl" alt="Book Cover" class="book-cover">
       <h3>{{ post.bookTitle }}</h3>
       <p><strong>Author:</strong> {{ post.authorName }}</p>
-      <p><strong>Genre:</strong> {{ post.bookType }}</p>
+      <p><strong>Type:</strong> {{ post.bookType }}</p>
       <p><strong>Your Review:</strong></p>
       <p>{{ post.bookReview }}</p>
     </div>
@@ -14,14 +14,33 @@
       <button @click="submitPost" class="btn submit-btn">Submit Post</button>
     </div>
   </div>
-  </template>
-  
-  <script>
-  export default {
-    name: 'PostPreview',
-    props: ['post'],
+</template>
+
+<script>
+import axios from 'axios';
+export default {
+  name: 'PostPreview',
+  props: ['post'],
+  data() {
+    return {
+      showPreview: true
+    }
+  },
+  methods: {
+    async submitPost() {
+      try {
+        const response = await axios.post('/api/posts', {
+          content: this.postContent,
+          author: 'Kullanıcı Adı' // Yazar bilgisi
+        });
+        console.log('Post başarıyla gönderildi:', response.data);
+      } catch (error) {
+        console.error('Post gönderilirken hata oluştu:', error);
+      }
+    }
   }
-  </script>
+}
+</script>
   
   <style scoped>
   .post-preview {

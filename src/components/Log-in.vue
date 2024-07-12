@@ -4,7 +4,7 @@
     <form name="login-form" @submit.prevent="submitForm">
         <div class="mb-3">
             <label for="email">E-mail:  </label>
-            <input id="email" v-model="form.email" type="email">
+            <input id="email" v-model="form.email" type="email"> 
         </div>
 
         <div class="mb-3">
