@@ -25,15 +25,15 @@
         <p v-if="error">{{ error }}</p>
         <div class="post" v-for="post in postsTruncatedReviews" :key="post.id">
           <div class="post-header">
-            <span class="date">{{ post.date }}</span>
-            <span class="user-name">{{ post.userName }}</span>
+            <span class="date">{{ post.postDate }}</span>
+            <span class="user-name">{{ post.userFullname }}</span>
           </div>
           <div class="post-content">
             <h2>{{ post.bookName }}</h2>
             <div class="book-info">
-              <img :src="post.bookCover" alt="Book Cover" class="book-cover">
+              <img :src="post.bookPhotoUrl" alt="Book Cover" class="book-cover">
               <div>
-                <p><strong>Author:</strong> {{ post.bookAuthor }}</p>
+                <p><strong>Author:</strong> {{ post.bookAuthorName }}</p>
                 <p><strong>Genre:</strong> {{ post.bookType }}</p>
               </div>
             </div>
