@@ -1,29 +1,30 @@
 <template>
   <div id="login-page">
-  <div class="login">
-    <form name="login-form" @submit.prevent="submitForm">
+    <div class="login">
+      <form name="login-form" @submit.prevent="login">
         <div class="mb-3">
-            <label for="email">E-mail:  </label>
-            <input id="email" v-model="form.email" type="email"> 
+          <label for="email">E-mail: </label>
+          <input id="email" v-model="form.email" type="email" required> 
         </div>
 
         <div class="mb-3">
-            <label for="password">Password:  </label>
-            <input id="password" v-model="form.password" type="password">
+          <label for="password">Password: </label>
+          <input id="password" v-model="form.password" type="password" required>
         </div>
-        <button class="btn" type="submit" v-on:click.prevent="login()">
-            Login
+        <button class="btn" type="submit" :disabled="isLoading">
+          {{ isLoading ? 'Logging in...' : 'Login' }}
         </button>
         <router-link to="/users/register">Create new account</router-link>
-        <p v-if="message">{{ message }}</p>          
-    </form>
-  </div>
-</div>   
+        <p v-if="message" :class="{ 'error-message': isError, 'success-message': !isError }">
+          {{ message }}
+        </p>          
+      </form>
+    </div>
+  </div>   
 </template>
 
 <script>
-
-//import axios from 'axios';
+import axios from 'axios';
 
 export default {
   data() {
@@ -33,38 +34,57 @@ export default {
         password: ''
       },
       message: '',
-     
+      isLoading: false,
+      isError: false
     };
   },
   methods: {
-    /*async submitForm() {
-      try {
-        const response = await axios.post('http://localhost:8080/users/login', this.form);
-        this.message = 'Form submitted successfully!' + response.message;
-      } catch (error) {
-        this.message = 'Error submitting form: ' + error.message;
-      }
-    },*/
-    login() {
-      this.$router.push('/');
- /* if (this.form.email && this.form.password) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(this.form.email)) {
-      alert("Geçerli bir e-posta adresi girin.");
-      return;
+    async login() {
+  this.isLoading = true;
+  this.message = '';
+  this.isError = false;
+
+  console.log('Attempting login with:', this.form);
+
+  try {
+    const response = await axios.post('http://localhost:8000/users/login', this.form);
+    console.log('Full login response:', response);
+
+    if (response.data && response.data.userId) {
+      // Token yerine userId'yi kontrol ediyoruz
+      localStorage.setItem('userId', response.data.userId);
+      localStorage.setItem('fullname', response.data.fullname || '');
+      localStorage.setItem('photoUrl', response.data.photoUrl || '');
+      
+      this.message = 'Login successful!';
+      console.log('Login successful, user data received');
+      setTimeout(() => this.$router.push('/'), 1500);
+    } else {
+      this.isError = true;
+      this.message = 'Login failed: User data not received';
+      console.error('Login response does not contain user data:', response.data);
     }
-    // Store the values in localStorage
-    localStorage.setItem('userEmail', this.form.email);
-    localStorage.setItem('userPassword', this.form.password);
-    this.submitForm();
+  } catch (error) {
+    this.isError = true;
+    console.error('Login error:', error);
+    
+    if (error.response) {
+      console.error('Error response:', error.response);
+      this.message = `Login failed: ${error.response.data.message || 'Invalid credentials'}`;
+    } else if (error.request) {
+      console.error('Error request:', error.request);
+      this.message = 'Login failed: No response from server. Please try again.';
+    } else {
+      this.message = `Login failed: ${error.message}`;
+    }
+  } finally {
+    this.isLoading = false;
   }
-  else {
-    alert("E-posta ve şifre boş bırakılamaz.");
-  } */
 }
   }
 };
 </script>
+
 
 <style>
 body, html {
@@ -122,6 +142,13 @@ input {
   border: none;
   border-radius: 20px;
   line-height: 40px;
+}
+
+.error-message {
+  color: red;
+}
+.success-message {
+  color: green;
 }
 
 .btn {
