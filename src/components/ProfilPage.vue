@@ -1,45 +1,50 @@
 <template>
-  <div class = "whole-page">
-  <div class="profile-page">
-    <h1>User Profile</h1>
-    <div class="profile-content">
-      <div class="avatar-section">
-        <img :src="selectedAvatar || user.photoUrl" alt="User Avatar" class="current-avatar">
-        <button @click="showAvatarSelection = !showAvatarSelection">Change Avatar</button>
-        <div v-if="showAvatarSelection" class="avatar-selection">
-          <div v-for="(photoUrl, index) in avatars" :key="index" class="avatar-option" @click="selectAvatar(photoUrl.src)">
-            <img :src="photoUrl.src" :alt="photoUrl.alt">
+  <div class="whole-page">
+    <div class="profile-page">
+      <h1>User Profile</h1>
+      <div class="profile-content">
+        <div class="avatar-section">
+          <img :src="selectedAvatar || user.photoUrl" alt="User Avatar" class="current-avatar">
+          <button @click="showAvatarSelection = !showAvatarSelection">Change Avatar</button>
+          <div v-if="showAvatarSelection" class="avatar-selection">
+            <div v-for="(photoUrl, index) in avatars" :key="index" class="avatar-option" @click="selectAvatar(photoUrl.src)">
+              <img :src="photoUrl.src" :alt="photoUrl.alt">
+            </div>
           </div>
         </div>
-      </div>
-      <div class="user-details">
-        <form @submit.prevent="updateProfile">
-          <div class="form-group">
-            <label for="fullname">Full Name:</label>
-            <input id="fullname" v-model="user.fullname" type="text" required>
-          </div>
-          <div class="form-group">
-            <label for="email">Email:</label>
-            <input id="email" v-model="user.email" type="email" required>
-          </div>
-          <div class="form-group">
-            <label for="password">New Password:</label>
-            <input id="password" v-model="user.password" type="password">
-          </div>
-          <button type="submit">Update Profile</button>
-        </form>
+        <div class="user-details">
+          <form @submit.prevent="updateProfile">
+            <div class="form-group">
+              <label for="fullname">Full Name:</label>
+              <input id="fullname" v-model="user.fullname" type="text" required>
+            </div>
+            <div class="form-group">
+              <label for="email">Email:</label>
+              <input id="email" v-model="user.email" type="email" required>
+            </div>
+            <div class="form-group">
+              <label for="password">New Password:</label>
+              <input id="password" v-model="user.password" type="password">
+            </div>
+            <button type="submit">Update Profile</button>
+          </form>
+          <!-- Hesap silme butonu -->
+          <button @click="confirmDeleteAccount" class="delete-account-btn">Delete Account</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   name: 'ProfilePage',
   data() {
     return {
       user: {
+        id: '',
         fullname: '',
         email: '',
         photoUrl: '',
@@ -59,6 +64,7 @@ export default {
   },
   methods: {
     loadUserData() {
+      this.user.id = localStorage.getItem('userId') || '';
       this.user.fullname = localStorage.getItem('fullname') || '';
       this.user.email = localStorage.getItem('userEmail') || '';
       this.user.photoUrl = localStorage.getItem('userAvatar') || '';
@@ -88,6 +94,32 @@ export default {
 
       alert('Profile updated successfully!');
       this.$router.push('/'); // Redirect to home page after update
+    },
+    confirmDeleteAccount() {
+      if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+        this.deleteAccount();
+      }
+    },
+    async deleteAccount() {
+      try {
+        const response = await axios.delete(`http://localhost:8000/users/delete/${this.user.id}`);
+        if (response.data === "User was deleted successfully") {
+          alert('Your account has been successfully deleted.');
+          // Kullanıcı oturumunu sonlandır ve local storage'ı temizle
+          localStorage.clear();
+          // Ana sayfaya yönlendir
+          this.$router.push('/');
+        } else {
+          alert('An error occurred while deleting your account. Please try again.');
+        }
+      } catch (error) {
+        if (error.response && error.response.data === `User not found with id: ${this.user.id}`) {
+          alert('User not found. Please check your account details.');
+        } else {
+          alert('An error occurred while deleting your account. Please try again.');
+        }
+        console.error('Error deleting account:', error);
+      }
     }
   }
 };
@@ -179,6 +211,19 @@ input {
   border: 1px solid #ccc;
   border-radius: 5px;
   font-size: 16px;
+}
+.delete-account-btn {
+  margin-top: 20px;
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.delete-account-btn:hover {
+  background-color: #ff1a1a;
 }
 
 button {

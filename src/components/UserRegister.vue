@@ -30,7 +30,7 @@
           </div>
         </div>
         
-        <button class="btn" type="submit" v-on:click="register()">
+        <button class="btn" type="submit" >
           Register
         </button>
       </form>
@@ -40,7 +40,7 @@
 </template>
 
 <script>
-//import axios from 'axios';
+import axios from 'axios';
 
 export default {
   data() {
@@ -71,34 +71,80 @@ export default {
   },
   
   register() {
-    if (this.form.email && this.form.password && this.selectedAvatar) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(this.form.email)) {
-        alert("Please enter a valid email address.");
+  if (!this.form.email || !this.form.password || !this.form.fullname || !this.selectedAvatar) {
+    this.message = "All fields are required.";
+    return;
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(this.form.email)) {
+    this.message = "Please enter a valid email address.";
+    return;
+  }
+
+  if (this.form.password.length < 8) {
+    this.message = "Password must be at least 8 characters long.";
+    return;
+  }
+
+  // Here you would typically make an API call to register the user
+  // For now, we'll just simulate success
+  this.message = "Registration successful!";
+  setTimeout(() => {
+    this.$router.push('/');
+  }, 2000);
+},
+async submitForm() {
+      if (!this.form.email || !this.form.password || !this.form.fullname || !this.selectedAvatar) {
+        this.message = "All fields are required.";
         return;
       }
-      
-      localStorage.setItem('userEmail', this.form.email);
-      localStorage.setItem('userPassword', this.form.password);
-      localStorage.setItem('fullname', this.form.fullname);
-      localStorage.setItem('userAvatar', this.selectedAvatar.src);
-      
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(this.form.email)) {
+        this.message = "Please enter a valid email address.";
+        return;
+      }
+
+      if (this.form.password.length < 8) {
+        this.message = "Password must be at least 8 characters long.";
+        return;
+      }
+
+      try {
+    const response = await axios.post('http://localhost:8000/users/register', this.form);
+    this.message = 'Registration successful! ' + response.data.message;
+    
+    // Kullanıcı bilgilerini localStorage'a kaydet
+    localStorage.setItem('userEmail', this.form.email);
+    localStorage.setItem('fullname', this.form.fullname);
+    localStorage.setItem('userAvatar', this.form.photoUrl);
+    
+    // Kısa bir gecikme sonrası ana sayfaya yönlendir
+    setTimeout(() => {
       this.$router.push('/');
+    }, 2000);
+  } catch (error) {
+    if (error.response) {
+      switch(error.response.status) {
+        case 409:
+          this.message = "This email is already registered. Please use a different email.";
+          break;
+        case 400:
+          this.message = "Invalid data submitted. Please check your inputs.";
+          break;
+        default:
+          this.message = 'Registration failed: ' + (error.response.data.message || 'Unknown error');
+      }
+    } else if (error.request) {
+      this.message = 'No response received from the server. Please try again later.';
     } else {
-      alert("Email, password, and avatar selection are required.");
+      this.message = 'Error submitting form: ' + error.message;
     }
   }
-    /*async submitForm() {
-      try {
-        const response = await axios.post('http://localhost:8080/users/register', this.form);
-        this.message = 'Form submitted successfully! ' + response.data.message;
-        this.$router.push('/'); // Başarılı form gönderimi sonrası ana sayfaya yönlendirme
-      } catch (error) {
-        this.message = 'Error submitting form: ' + error.message;
-      }
-    },*/
-   
+    },
   }
+   
   };
 </script>
 
