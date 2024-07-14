@@ -12,41 +12,50 @@
     <main>
       <h1 class="main-heading">{{ headline }}</h1>
       <p class="subheading">{{ subheadline }}</p>
-      <div class="posts-slider">
-        <button @click="prevSlide" class="slider-btn prev">&lt;</button>
-        <div class="posts-container" :style="{ transform: `translateX(${-currentIndex * 100}%)` }">
-          <div class="post" v-for="post in posts" :key="post.id">
-            <img :src="post.bookCover" :alt="post.bookName" class="book-cover">
-            <div class="post-content">
-              <h3>{{ post.bookName }}</h3>
-              <p class="author">by {{ post.bookAuthor }}</p>
-              <p class="genre">Type: {{ post.bookType }}</p>
-              <p class="review">{{ truncate(post.review, 200) }}</p>
-              <p class="date">Posted on: {{ post.date }}</p>
+      
+      <div v-if="loading">Loading...</div>
+      <div v-else-if="error">{{ error }}</div>
+      <div v-else>
+        <div class="posts-slider" v-if="posts.length > 0">
+          <button @click="prevSlide" class="slider-btn prev">&lt;</button>
+          <div class="posts-container" :style="{ transform: `translateX(${-currentIndex * 100}%)` }">
+            <div class="post" v-for="post in posts" :key="post.id">
+              <img :src="post.bookPhotoUrl" :alt="post.bookTitle" class="book-cover">
+              <div class="post-content">
+                <h3>{{ post.bookTitle }}</h3>
+                <p class="author">by {{ post.bookAuthorName }}</p>
+                <p class="genre">Type: {{ post.bookType }}</p>
+                <p class="review">{{ truncate(post.review, 200) }}</p>
+                <p class="date">Posted on: {{ post.postDate }}</p>
+              </div>
             </div>
           </div>
+          <button @click="nextSlide" class="slider-btn next">&gt;</button>
         </div>
-        <button @click="nextSlide" class="slider-btn next">&gt;</button>
-      </div>
-      <section class="top-ten-books">
-      <h2>Top 10 Books</h2>
-      <div class="top-books-grid">
-        <div v-for="book in topTenBooks" :key="book.id" class="top-book-card">
-          <img :src="book.photoUrl" :alt="book.title" class="top-book-cover">
-          <div class="top-book-info">
-            <h3>{{ book.title }}</h3>
-            <p class="author">by {{ book.authorName }}</p>
+        
+        <section class="top-ten-books" v-if="topBooks.length > 0">
+          <h2>Top 10 Books</h2>
+          <div class="top-books-grid">
+            <div v-for="book in topBooks" :key="book.id" class="top-book-card">
+              <img :src="book.photoUrl" :alt="book.title" class="top-book-cover">
+              <div class="top-book-info">
+                <h3>{{ book.bookTitle }}</h3>
+                <p class="author">by {{ book.authorName }}</p>
+              </div>
+            </div>
           </div>
-        </div>
+        </section>
       </div>
-    </section>
     </main>
     <footer>
       <p>&copy; {{ currentYear }} {{ companyName }}. All rights reserved.</p>
     </footer>
   </div>
 </template>
+
 <script>
+import axios from 'axios';
+
 export default {
   data() {
     return {
@@ -55,70 +64,53 @@ export default {
       subheadline: 'Your Gateway to Great Reads.',
       currentYear: new Date().getFullYear(),
       currentIndex: 0,
-      
-      topTenBooks: [  
-        { id: 1, title: "To Kill a Mockingbird", authorName: "Harper Lee", photoUrl: "https://m.media-amazon.com/images/I/51g3u0pKK4L._SY445_SX342_.jpg" },
-        { id: 2, title: "1984", authorName: "George Orwell", photoUrl: "https://avatars.dzeninfra.ru/get-zen_doc/1706621/pub_61a0e1c2e90f1c2241dbfefb_61a0ef8835cb395eb604a57e/scale_1200" },
-        { id: 3, title: "Pride and Prejudice", authorName: "Jane Austen", photoUrl: "https://m.media-amazon.com/images/I/81NLDvyAHrL._AC_UY218_.jpg" },
-        { id: 4, title: "The Great Gatsby", authorName: "F. Scott Fitzgerald", photoUrl: "https://m.media-amazon.com/images/I/91pySFftptL._AC_UY218_.jpg" },
-        { id: 5, title: "One Hundred Years of Solitude", authorName: "Gabriel García Márquez", photoUrl: "https://m.media-amazon.com/images/I/714ZLzX852L._AC_UY218_.jpg" },
-        { id: 6, title: "The Catcher in the Rye", authorName: "J.D. Salinger", photoUrl: "https://m.media-amazon.com/images/I/71c-1s150eL._AC_UY218_.jpg" },
-        { id: 7, title: "The Hobbit", authorName: "J.R.R. Tolkien", photoUrl: "https://m.media-amazon.com/images/I/51HJMYGOdBL._SY445_SX342_.jpg" },
-        { id: 8, title: "The Hunger Games", authorName: "Suzanne Collins", photoUrl: "https://m.media-amazon.com/images/I/81gExM+-XtL._AC_UY218_.jpg" },
-        { id: 9, title: "The Da Vinci Code", authorName: "Dan Brown", photoUrl: "https://m.media-amazon.com/images/I/81gPg90cAML._AC_UY218_.jpg" },
-        { id: 10, title: "The Alchemist", authorName: "Paulo Coelho", photoUrl: "https://m.media-amazon.com/images/I/81FPzmB5fgL._AC_UY218_.jpg" },
-      ],
-      
-      posts: [
-        {
-          id: 1,
-          date: new Date(2023, 6, 9).toLocaleDateString(),
-          userName: '',
-          bookName: 'The Life Of Prophet Muhammed(s.a.v)',
-          bookAuthor: 'Martin LINGS',
-          bookType: 'RELIGION',
-          bookCover: 'https://1.bp.blogspot.com/_GNxGuhDeops/RvTFbWihxQI/AAAAAAAAAA8/-yeu8KLDBhw/s1600/ingtr.bmp',
-          review: "1984 is a chilling portrayal of a totalitarian future where critical thought is suppressed under a surveillance state. Orwell's masterpiece remains eerily relevant today, serving as a stark warning about the dangers of totalitarianism, surveillance, and the manipulation of truth. The novel's exploration of themes like doublethink, newspeak, and the erosion of personal freedom resonates deeply in our current digital age. Winston Smith's struggle against the omnipresent Big Brother is a powerful reminder of the importance of individual liberty and the courage to maintain one's humanity in the face of oppression. This book is not just a classic of dystopian literature, but a crucial lens through which to view our own society's relationship with power, truth, and freedom.",
-        },
-        {
-          id: 2,
-          date: new Date().toLocaleDateString(),
-          userName: '',
-          bookName: 'The Surgeon',
-          bookAuthor: 'Tess GERRITSEN',
-          bookType: 'THRILLER',
-          bookCover: 'https://m.media-amazon.com/images/I/81X2W7kBNjL._SX342_.jpg',
-          review: "He slips into homes at night and walks silently into bedrooms where women lie sleeping, about to awaken to a living nightmare. The precision of his methods suggests that he is a deranged man of medicine, prompting the Boston newspapers to dub him 'The Surgeon.' Led by Detectives Thomas Moore and Jane Rizzoli, the cops must consult the victim of a nearly identical crime: Two years ago, Dr. Catherine Cordell fought back and filled an attacker before he could complete his assault. Now this new killer is re-creating, with chilling accuracy, the details of Cordell's ordeal. With every new murder he seems to be taunting her, cutting ever closer, from her hospital to her home. And neither Moore nor Rizzoli can protect Cordell from a ruthless hunter who somehow understands—and savors—the secret fears of every woman he kills.",
-        },
-        {
-          id: 3,
-          date: new Date(2024, 6, 6).toLocaleDateString(),
-          userName: '',
-          bookName: 'The Bloodstream',
-          bookAuthor: 'Tess GERRİTSEN',
-          bookType: 'HORROR',
-          bookCover: 'https://m.media-amazon.com/images/I/81IoUHDbGOL._AC_UY218_.jpg',
-          review: "Tess Gerritsen again weaves frighteningly realistic medical detail into heart-stopping suspense, as a small-town doctor races to unravel the roots of a violent epidemic - before it destroys everything she loves. Lapped by the gentle waters of Locust Lake, the small resort town of Tranquility, Maine, seems like the perfect spot for Dr. Claire Elliot to shelter her adolescent son, Noah, from the distractions of the big city, and the lingering memory of his father's death. She's also hopeful that she can earn the trust of the town as she builds a new practice. But all her plans unravel with the news of a shocking incident: a teenage boy under her care has committed an appalling act of violence. Claire has stopped prescribing a controversial drug to the troubled boy, a decision that some in town now second-guess. But before she can defend herself, a rash of new teenage violence erupts in Tranquility, forcing Claire to perform increasingly risky emergency procedures. And when one of her patients dies, the town's panic turns to fury. Shaken by accusations, and fearful that Noah is now at risk, Claire desperately searches for a medical cause behind the murderous epidemic. She begins to suspect that the placid waters of Locust lake conceal a disturbing history - and an insidiously lethal danger. But while Claire races to save the town - and her son - from harm, she discovers an even greater threat: a shocking conspiracy to manipulate nature, and turn innocents to slaughter.",
-        }
-      ],
-      topTenIndex: 0, // Add topTenIndex for top ten slider
+      topBooks: [],      
+      posts: [],
+      loading: false,
+      error: null,
     };
   },
   methods: {
+    async fetchPosts() {
+      this.loading = true;
+      this.error = null;
+      try {
+        const response = await axios.get('http://localhost:8000/posts/all');
+        this.posts = response.data;
+      } catch (error) {
+        console.error('Error fetching posts:', error);
+        if (error.response) {
+          console.error('Response status:', error.response.status);
+          console.error('Response data:', error.response.data);
+          this.error = `Failed to fetch posts. Server responded with ${error.response.status}.`;
+        } else if (error.request) {
+          console.error('No response received:', error.request);
+          this.error = 'Failed to fetch posts. No response received from server.';
+        } else {
+          console.error('Error setting up the request:', error.message);
+          this.error = 'Failed to fetch posts. Error setting up the request.';
+        }
+      } finally {
+        this.loading = false;
+      }
+    },
+    async fetchTopBooks() {
+      this.loading = true;
+      this.error = null;
+      try {
+        const response = await axios.get('http://localhost:8000/books/all');
+        this.topBooks = response.data.slice(0, 10);
+      } catch (error) {
+        console.error('Error fetching top books:', error);
+        this.error = 'Failed to fetch top books. Please try again later.';
+      } finally {
+        this.loading = false;
+      }
+    },
     truncate(text, length = 100) {
-    if (!text) return ''; 
-    return text.length > length ? text.slice(0, length) + '...' : text;
-  },
-  prevTopTenSlide() {
-    if (this.topTenIndex > 0) {
-      this.topTenIndex--;
-    }
-  },
-  nextTopTenSlide() {
-    if (this.topTenIndex < this.topTenBooks.length - 1) {
-      this.topTenIndex++;
-    }
-  },
+      if (!text) return ''; 
+      return text.length > length ? text.slice(0, length) + '...' : text;
+    },
     prevSlide() {
       if (this.currentIndex > 0) {
         this.currentIndex--;
@@ -130,10 +122,10 @@ export default {
       }
     },
   },
-  //created() {
-    // Initialize topTenBooks with the first 10 books from topBooks
-    //this.topTenBooks = this.topBooks.slice(0, 10);
-  //}
+  created() {
+    this.fetchPosts();
+    this.fetchTopBooks();
+  }
 };
 </script>
 
