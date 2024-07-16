@@ -135,7 +135,7 @@ export default {
       }
     },
     loadUserAvatar() {
-      const savedAvatar = localStorage.getItem('userAvatar');
+      const savedAvatar = localStorage.getItem('photoUrl');
       this.userAvatar = savedAvatar || '@/assets/default-avatar.png';
     },
     loadUserFullName() {

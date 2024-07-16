@@ -67,7 +67,7 @@ export default {
       this.user.id = localStorage.getItem('userId') || '';
       this.user.fullname = localStorage.getItem('fullname') || '';
       this.user.email = localStorage.getItem('userEmail') || '';
-      this.user.photoUrl = localStorage.getItem('userAvatar') || '';
+      this.user.photoUrl = localStorage.getItem('photoUrl') || '';
     },
     selectAvatar(avatarSrc) {
       this.selectedAvatar = avatarSrc;

@@ -1,4 +1,4 @@
-Copy<template>
+<template>
   <div id="post-creation">
     <form @submit.prevent="previewPost" v-if="!showPreview">
       <h2>Create a New Book Post</h2>
@@ -55,108 +55,79 @@ Copy<template>
     <p v-if="message" :class="['message', messageType]">{{ message }}</p>
   </div>
 </template>
+
 <script>
-import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
-import { useStore } from 'vuex'
-import axios from 'axios'
+import axios from 'axios';
 
 export default {
-  name: 'PostCreation',
-  
-  setup() {
-    const router = useRouter()
-    const store = useStore()
-    const message = ref('')
-    const messageType = ref('')
-    const showPreview = ref(false)
-
-    const bookGenres = [
-      'HISTORY', 'ADVENTURE', 'PERSONAL', 'SCIENCE', 'THRILLER',
-      'HORROR', 'CLASSIC', 'HUMOR', 'ROMANCE', 'RELIGION'
-    ]
-
-    const post = ref({
-      bookTitle: '',
-      bookType: '',
-      authorName: '',
-      bookPhotoUrl: '',
-      bookReview: '',
-    })
-
-    const isFormValid = computed(() => {
-      return post.value.bookTitle.trim() !== '' &&
-             post.value.bookType !== '' &&
-             post.value.authorName.trim() !== '' &&
-             post.value.bookPhotoUrl.trim() !== '' &&
-             post.value.bookReview.trim() !== '' &&
-             post.value.bookReview.length <= 1000
-    })
-
-    const previewPost = () => {
-      if (isFormValid.value) {
-        showPreview.value = true
+  data() {
+    return {
+      post: {
+        bookTitle: '',
+        bookType: '',
+        authorName: '',
+        bookPhotoUrl: '',
+        bookReview: '',
+        userId: localStorage.getItem('userId')
+      },
+      bookGenres: ['HISTORY', 'ADVENTURE', 'PERSONAL', 'SCIENCE', 'THRILLER',
+      'HORROR', 'CLASSIC', 'HUMOR', 'ROMANCE', 'RELIGION'], 
+      showPreview: false,
+      message: '',
+      messageType: ''
+    }
+  },
+  computed: {
+    isFormValid() {
+      return this.post.bookTitle && this.post.bookType && this.post.authorName && 
+             this.post.bookPhotoUrl && this.post.bookReview;
+    }
+  },
+  methods: {
+    previewPost() {
+      if (this.isFormValid) {
+        this.showPreview = true;
       } else {
-        setMessage('Please fill out all fields correctly.', 'error')
+        this.message = 'Please fill in all fields';
+        this.messageType = 'error';
       }
+    },
+    async submitPost() {
+  try {
+    console.log('Sending post data:', this.post);  // Gönderilen veriyi logla
+    const response = await axios.post('http://localhost:8000/posts/new-post', this.post);
+    console.log('Post başarıyla gönderildi:', response.data);
+    this.message = 'Post successfully submitted!';
+    this.messageType = 'success';
+    this.resetForm();
+  } catch (error) {
+    console.error('Post gönderilirken hata oluştu:', error);
+    if (error.response) {
+      console.error('Error data:', error.response.data);
+      this.message = `Server error: ${error.response.status} - ${error.response.data.error || 'Unknown error'}`;
+    } else if (error.request) {
+      this.message = 'No response received from server';
+    } else {
+      this.message = 'Error setting up the request';
     }
-
-    const submitPost = async () => {
-      try {
-        const userId = store.state.user?.id
-        if (!userId) {
-          throw new Error('User ID not available. Please ensure you are logged in.')
-        }
-
-        const response = await axios.post('http://localhost:8080/users/new-post', {
-          ...post.value,
-          userId
-        })
-        
-        if (response.data && response.data.id) {
-          setMessage('Post created successfully!', 'success')
-          router.push({ name: 'ViewPost', params: { postId: response.data.id } })
-        } else {
-          throw new Error('Post creation successful, but no post ID returned.')
-        }
-      } catch (error) {
-        handleError(error)
-      }
-    }
-
-    const setMessage = (msg, type) => {
-      message.value = msg
-      messageType.value = type
-      setTimeout(() => {
-        message.value = ''
-        messageType.value = ''
-      }, 5000)
-    }
-
-    const handleError = (error) => {
-      if (error.response) {
-        setMessage(`Server error: ${error.response.status} - ${error.response.data}`, 'error')
-      } else if (error.request) {
-        setMessage('Network error: No response received from server. Please check your internet connection and try again.', 'error')
-      } else {
-        setMessage('Error: ' + error.message, 'error')
-      }
-      console.error('Error details:', error)
-    }
-
-    return { 
-      post,
-      bookGenres,
-      previewPost,
-      submitPost,
-      message,
-      messageType,
-      showPreview,
-      isFormValid
+    this.messageType = 'error';
+  }
+},
+    resetForm() {
+      this.post = {
+        bookTitle: '',
+        bookType: '',
+        authorName: '',
+        bookPhotoUrl: '',
+        bookReview: ''
+      };
+      this.showPreview = false;
     }
   }
 }
 </script>
+
+
 
 <style scoped>
 body, html {

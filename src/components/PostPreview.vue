@@ -28,16 +28,16 @@ export default {
   },
   methods: {
     async submitPost() {
-      try {
-        const response = await axios.post('/api/posts', {
-          content: this.postContent,
-          author: 'Kullanıcı Adı' // Yazar bilgisi
-        });
-        console.log('Post başarıyla gönderildi:', response.data);
-      } catch (error) {
-        console.error('Post gönderilirken hata oluştu:', error);
-      }
-    }
+  try {
+    const response = await axios.post('/posts/all', this.post);
+    console.log('Post başarıyla gönderildi:', response.data);
+    // You might want to add some user feedback here, like a success message
+    // or redirecting to another page
+  } catch (error) {
+    console.error('Post gönderilirken hata oluştu:', error);
+    // You might want to show an error message to the user here
+  }
+}
   }
 }
 </script>
