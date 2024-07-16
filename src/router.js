@@ -12,8 +12,7 @@ const routes = [
   { path: '/posts/new-post',name: 'CreatePost', component: PostCreation },
   { path: '/users/login', name: 'Login', component: Login },
   { path: '/users/register', name: 'Register', component: UserRegister },
-  { path: '/profile', name: 'Profile',  component: ProfilePage }
-  
+  { path: '/profile', name: 'Profile',  component: ProfilePage },
   // Add other routes here
 ];
 

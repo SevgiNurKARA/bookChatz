@@ -28,10 +28,24 @@
             </div>
             <button type="submit">Update Profile</button>
           </form>
-          <!-- Hesap silme butonu -->
           <button @click="confirmDeleteAccount" class="delete-account-btn">Delete Account</button>
         </div>
       </div>
+      <div class="user-posts">
+        <h2>My Posts ({{ userPosts.length }})</h2>
+        <div v-if="userPosts.length === 0">You haven't created any posts yet.</div>
+        <div v-else class="post-list">
+        <div v-for="(post, index) in userPosts" :key="post.id || index" class="post-item">
+            <h3>{{ index + 1 }}. {{ post.bookTitle }}</h3>
+            <p><strong>Author:</strong> {{ post.bookAuthorName }}</p>
+            <p><strong>Type:</strong> {{ post.bookType }}</p>
+            <img v-if="post.bookPhotoUrl" :src="post.bookPhotoUrl" alt="Book Cover" class="book-cover">
+            <p><strong>Review:</strong> {{ post.review }}</p>
+            <button @click="editPost(post.id)">Edit</button>
+            <button @click="deletePost(post.id)">Delete</button>
+        </div>
+        </div>
+      </div>      
     </div>
   </div>
 </template>
@@ -43,6 +57,7 @@ export default {
   name: 'ProfilePage',
   data() {
     return {
+      userPosts: [] ,
       user: {
         id: '',
         fullname: '',
@@ -60,13 +75,37 @@ export default {
     };
   },
   created() {
-    this.loadUserData();
-  },
+  this.loadUserData();
+  this.$nextTick(async () => {
+    await this.loadUserPosts();
+    console.log('After loading, userPosts:', JSON.stringify(this.userPosts, null, 2));
+  });
+},
+
   methods: {
+    async loadUserPosts() {
+  try {
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+      console.error('User ID is missing');
+      return;
+    }
+    const response = await axios.get(`http://localhost:8000/posts/users/${userId}`);
+    
+    this.userPosts=response.data;
+    
+    console.log('Number of posts:', this.userPosts.length);
+  } catch (error) {
+    console.error('Error loading user posts:', error);
+    if (error.response) {
+      console.error('Error response:', error.response.data);
+    }
+  }
+},
     loadUserData() {
       this.user.id = localStorage.getItem('userId') || '';
       this.user.fullname = localStorage.getItem('fullname') || '';
-      this.user.email = localStorage.getItem('userEmail') || '';
+      this.user.email = localStorage.getItem('email') || '';
       this.user.photoUrl = localStorage.getItem('photoUrl') || '';
     },
     selectAvatar(avatarSrc) {
@@ -76,22 +115,12 @@ export default {
     updateProfile() {
       // Update user data in localStorage
       localStorage.setItem('fullname', this.user.fullname);
-      localStorage.setItem('userEmail', this.user.email);
-      localStorage.setItem('userAvatar', this.selectedAvatar || this.user.photoUrl);
+      localStorage.setItem('email', this.user.email);
+      localStorage.setItem('photoUrl', this.selectedAvatar || this.user.photoUrl);
 
       if (this.user.password) {
         localStorage.setItem('userPassword', this.user.password);
       }
-
-      // In a real application, you would send this data to a server
-      // axios.post('/api/update-profile', this.user)
-      //   .then(response => {
-      //     // Handle success
-      //   })
-      //   .catch(error => {
-      //     // Handle error
-      //   });
-
       alert('Profile updated successfully!');
       this.$router.push('/'); // Redirect to home page after update
     },
@@ -102,13 +131,14 @@ export default {
     },
     async deleteAccount() {
       try {
+        
         const response = await axios.delete(`http://localhost:8000/users/delete/${this.user.id}`);
         if (response.data === "User was deleted successfully") {
           alert('Your account has been successfully deleted.');
           // Kullanıcı oturumunu sonlandır ve local storage'ı temizle
           localStorage.clear();
           // Ana sayfaya yönlendir
-          this.$router.push('/');
+          this.$router.push('/landing');
         } else {
           alert('An error occurred while deleting your account. Please try again.');
         }
@@ -120,22 +150,41 @@ export default {
         }
         console.error('Error deleting account:', error);
       }
+    },
+    editPost(postId) {
+      // Düzenleme sayfasına yönlendir
+      this.$router.push(`/profile/${postId}`);
+    },
+    async deletePost(postId) {
+      if (confirm('Are you sure you want to delete this post?')) {
+        try {
+          await axios.delete(`http://localhost:8000/posts/delete/${postId}`);
+          this.userPosts = this.userPosts.filter(post => post.id !== postId);
+        } catch (error) {
+          console.error('Error deleting post:', error);
+          alert('An error occurred while deleting the post.');
+        }
+      }
     }
   }
 };
 </script>
 
 <style scoped>
-.whole-page{
+.whole-page {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  justify-content: center;
+  align-items: flex-start;
   padding: 1rem;
   background-color: #6F4E37;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  min-height: 100vh;
 }
+
 .profile-page {
-  width: 800px;
+  display: flex;
+  flex-direction: row-reverse; /* This will move the profile to the right */
+  width: 90%;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
   background-color: #A67B5B;
@@ -144,20 +193,25 @@ export default {
   font-family: Arial, sans-serif;
 }
 
-.profile-page h1 {
-  text-align: center;
-  color: #070707;
+.left-section {
+  flex: 3;
+  padding-right: 20px;
+}
+
+.right-section {
+  flex: 1;
+  padding-left: 20px;
+  border-left: 1px solid #ddd;
+}
+
+/* User profile styles */
+.user-details {
   margin-bottom: 20px;
 }
 
-.profile-content {
-  display: flex;
-  gap: 30px;
-}
-
 .avatar-section {
-  flex: 1;
   text-align: center;
+  margin-bottom: 20px;
 }
 
 .current-avatar {
@@ -169,75 +223,99 @@ export default {
   border: 3px solid #ddd;
 }
 
-.avatar-selection {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 10px;
-  justify-content: center;
-}
-
-.avatar-option img {
-  width: 50px;
-  height: 50px;
-  object-fit: cover;
-  border-radius: 50%;
-  cursor: pointer;
-  border: 2px solid transparent;
-}
-
-.avatar-option img:hover {
-  border-color: #4CAF50;
-}
-
-.user-details {
-  flex: 2;
-}
-
+/* Form styles */
 .form-group {
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
 label {
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 5px;
   color: #131212;
   font-weight: bold;
 }
 
 input {
   width: 100%;
-  padding: 10px;
+  padding: 8px;
   border: 1px solid #ccc;
   border-radius: 5px;
-  font-size: 16px;
-}
-.delete-account-btn {
-  margin-top: 20px;
-  background-color: #ff4d4d;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.delete-account-btn:hover {
-  background-color: #ff1a1a;
+  font-size: 14px;
 }
 
 button {
   background-color: #4CAF50;
   color: white;
-  padding: 12px 20px;
+  padding: 10px 15px;
   border: none;
   border-radius: 5px;
-  font-size: 16px;
+  font-size: 14px;
   cursor: pointer;
   width: 100%;
+  margin-bottom: 10px;
 }
 
 button:hover {
   background-color: #45a049;
+}
+
+.delete-account-btn {
+  background-color: #ff4d4d;
+}
+
+.delete-account-btn:hover {
+  background-color: #ff1a1a;
+}
+.user-posts {
+  flex: 3;
+  padding-right: 20px;
+}
+
+.post-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+  width: 100%;
+}
+
+.post-item {
+  border: 1px solid #ddd;
+  padding: 15px;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  display: flex;
+  flex-direction: column;
+}
+
+.book-cover {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  margin-bottom: 10px;
+  border-radius: 5px;
+}
+
+.post-item h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.post-item p {
+  margin-bottom: 10px;
+}
+
+.post-item button {
+  margin-top: 8px;
+  padding: 5px 10px;
+  font-size: 12px;
+}
+
+.post-item button:first-of-type {
+  margin-right: 5px;
+  background-color: #4CAF50;
+}
+
+.post-item button:last-of-type {
+  background-color: #f44336;
 }
 </style>

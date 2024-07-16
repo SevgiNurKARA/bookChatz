@@ -53,8 +53,9 @@ export default {
     if (response.data && response.data.userId) {
       // Token yerine userId'yi kontrol ediyoruz
       localStorage.setItem('userId', response.data.userId);
-      localStorage.setItem('fullname', response.data.fullname || '');
-      localStorage.setItem('photoUrl', response.data.photoUrl || '');
+      localStorage.setItem('fullname', response.data.fullname);
+      localStorage.setItem('photoUrl', response.data.photoUrl);
+      localStorage.setItem('email', response.data.email);
       
       this.message = 'Login successful!';
       console.log('Login successful, user data received');
