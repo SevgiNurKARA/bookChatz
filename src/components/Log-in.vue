@@ -89,81 +89,81 @@ export default {
 
 <style>
 body, html {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  width: 100%;
-}
-
-#login-page {
-  height: 100%;
-  width: 100%;
-  background-image: url('@/assets/bookBackground.jpeg');
-  background-size: cover;
-  background-position: center;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 650px;
-}
-.login {
-  width: 400px;
-  background-color: rgba(0, 0, 0, 0.6);
-  color: white;
-  border: 1px solid rgb(5, 5, 5);
-  border-radius: 20px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.75);
-  overflow: hidden;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+  }
   
-}
-
-form {
-  box-sizing: border-box;
-  width: 100%;
-  padding: 40px;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-label {
-  color: rgba(255, 255, 255, 0.8);
-  text-transform: uppercase;
-  font-size: 10px;
-  letter-spacing: 2px;
-  padding-left: 10px;
-}
-
-input {
-  height: 40px;
-  padding: 0 20px;
-  margin-bottom: 20px;
-  background: rgba(255, 255, 255, 0.8);
-  color: rgb(24, 22, 18);
-  border: none;
-  border-radius: 20px;
-  line-height: 40px;
-}
-
-.error-message {
-  color: red;
-}
-.success-message {
-  color: green;
-}
-
-.btn {
-  height: 40px;
-  margin: 10px 0;
-  background: rgb(45, 126, 231);
-  color: white;
-  text-transform: uppercase;
-  border: 1px solid rgb(0, 0, 0);
-  border-radius: 40px;
-  line-height: 40px;
-  cursor: pointer;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-}
-
+  #login-page {
+    height: 100%;
+    width: 100%;
+    background-image: url('@/assets/bookBackground.jpeg');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 650px;
+  }
+  .login {
+    width: 400px;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: 1px solid rgb(5, 5, 5);
+    border-radius: 20px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.75);
+    overflow: hidden;
+    
+  }
+  
+  form {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  label {
+    color: rgba(255, 255, 255, 0.8);
+    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: 2px;
+    padding-left: 10px;
+  }
+  
+  input {
+    height: 40px;
+    padding: 0 20px;
+    margin-bottom: 20px;
+    background: rgba(255, 255, 255, 0.8);
+    color: rgb(24, 22, 18);
+    border: none;
+    border-radius: 20px;
+    line-height: 40px;
+  }
+  
+  .error-message {
+    color: red;
+  }
+  .success-message {
+    color: green;
+  }
+  
+  .btn {
+    height: 40px;
+    margin: 10px 0;
+    background: rgb(45, 126, 231);
+    color: white;
+    text-transform: uppercase;
+    border: 1px solid rgb(0, 0, 0);
+    border-radius: 40px;
+    line-height: 40px;
+    cursor: pointer;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  }
+  
 
 </style>

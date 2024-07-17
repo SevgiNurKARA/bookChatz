@@ -3,6 +3,7 @@
     <header>
       <div class="logo">
         <img src="@/assets/bookChatz.jpg" alt="Logo">
+        <div class="about" @click="$router.push('/about-us')">About Us</div>
       </div>
       <div class="header-actions">
         <button class="create-post-btn" @click="navigateToCreatePost">
@@ -67,6 +68,7 @@
 
 <script>
 import axios from 'axios';
+import '@/components/Homepage.css';
 
 export default {
   name: 'HomePage',
@@ -151,8 +153,7 @@ export default {
 };
 </script>
 
-
-<style scoped>
+<style>
 .home-page {
   display: flex;
   flex-direction: column;
@@ -175,6 +176,16 @@ header {
   align-items: center;
 }
 
+.about-us {
+  width: 1500px;
+  height: 650px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  color: #333;
+  background-color: #BC8B68;
+}
 .create-post-btn {
   margin-right: 20px;
   padding: 10px 15px;
@@ -374,4 +385,5 @@ header {
   font-size: 0.9rem;
   
 }
+
 </style>
