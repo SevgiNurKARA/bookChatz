@@ -5,6 +5,7 @@ import PostCreation from './components/PostCreation.vue';
 import Login from './components/Log-in.vue';
 import UserRegister from './components/UserRegister.vue';
 import ProfilePage from './components/ProfilPage.vue';
+import PostEdit from './components/PostEdit.vue';
 
 const routes = [
   { path: '/landing', component: LandingPage },
@@ -13,7 +14,7 @@ const routes = [
   { path: '/users/login', name: 'Login', component: Login },
   { path: '/users/register', name: 'Register', component: UserRegister },
   { path: '/profile', name: 'Profile',  component: ProfilePage },
-  // Add other routes here
+  { path: '/posts/preview/:id', name: 'PostEdit', component: PostEdit},
 ];
 
 const router = createRouter({

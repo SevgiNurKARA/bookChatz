@@ -35,14 +35,14 @@
         <h2>My Posts ({{ userPosts.length }})</h2>
         <div v-if="userPosts.length === 0">You haven't created any posts yet.</div>
         <div v-else class="post-list">
-        <div v-for="(post, index) in userPosts" :key="post.id || index" class="post-item">
+        <div v-for="(post, index) in userPosts" :key="post.postId || index" class="post-item">
             <h3>{{ index + 1 }}. {{ post.bookTitle }}</h3>
             <p><strong>Author:</strong> {{ post.bookAuthorName }}</p>
             <p><strong>Type:</strong> {{ post.bookType }}</p>
             <img v-if="post.bookPhotoUrl" :src="post.bookPhotoUrl" alt="Book Cover" class="book-cover">
             <p><strong>Review:</strong> {{ post.review }}</p>
-            <button @click="editPost(post.id)">Edit</button>
-            <button @click="deletePost(post.id)">Delete</button>
+            <button @click="editPost(post.postId)">Edit</button>
+            <button @click="deletePost(post.postId)">Delete</button>
         </div>
         </div>
       </div>      
@@ -152,9 +152,8 @@ export default {
       }
     },
     editPost(postId) {
-      // Düzenleme sayfasına yönlendir
-      this.$router.push(`/profile/${postId}`);
-    },
+    this.$router.push({ name: 'PostEdit', params: { id: postId } });
+  },
     async deletePost(postId) {
       if (confirm('Are you sure you want to delete this post?')) {
         try {
@@ -273,7 +272,8 @@ button:hover {
 
 .post-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  width: 100%;
+  max-width: 800px;
   gap: 20px;
   width: 100%;
 }
@@ -288,11 +288,12 @@ button:hover {
 }
 
 .book-cover {
-  width: 100%;
-  height: 200px;
-  object-fit: cover;
+  width: 100px;
+  height: 150px;
   margin-bottom: 10px;
   border-radius: 5px;
+  object-fit: cover;
+  margin-right: 20px;
 }
 
 .post-item h3 {

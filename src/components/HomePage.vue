@@ -23,7 +23,7 @@
       <div class="posts-section">
         <p v-if="loading">Loading posts...</p>
         <p v-if="error">{{ error }}</p>
-        <div class="post" v-for="post in postsTruncatedReviews" :key="post.id">
+        <div class="post" v-for="post in posts" :key="post.id">
           <div class="post-header">
             <span class="date">{{ post.postDate }}</span>
             <span class="user-name">{{ post.userFullname }}</span>
@@ -43,7 +43,7 @@
             {{ post.showFullReview || post.review.length <= 300 ? post.review : post.review.slice(0, 300) + '...' }}
           </p>
           <button v-if="post.review.length > 300" @click="toggleReview(post)" class="read-more-btn">
-            {{ post.showFullReview ? 'Daha az göster' : 'Devamını oku' }}
+            {{ post.showFullReview ? 'Show less' : 'Show more' }}
           </button>
             </div>
           </div>
@@ -86,53 +86,43 @@ export default {
     this.fetchPosts();
     this.fetchTopBooks();
   },
-  computed: {
-    postsTruncatedReviews() {
-      return this.posts.map(post => ({
-        ...post,
-        truncatedReview: post.review.length > 300 
-          ? post.review.slice(0, 300) + '...' 
-          : post.review,
-        showFullReview: false
-      }));
-    }
-  },
   methods: {
     async fetchPosts() {
-    this.loading = true;
-    this.error = null;
-    try {
-      const response = await axios.get('http://localhost:8000/posts/all');
-      this.posts = response.data;
-    } catch (error) {
-      console.error('Error fetching posts:', error);
-      if (error.response) {
-        console.error('Response status:', error.response.status);
-        console.error('Response data:', error.response.data);
-        this.error = `Failed to fetch posts. Server responded with ${error.response.status}.`;
-      } else if (error.request) {
-        console.error('No response received:', error.request);
-        this.error = 'Failed to fetch posts. No response received from server.';
-      } else {
-        console.error('Error setting up the request:', error.message);
-        this.error = 'Failed to fetch posts. Error setting up the request.';
+      this.loading = true;
+      this.error = null;
+      try {
+        const response = await axios.get('http://localhost:8000/posts/all');
+        this.posts = response.data.map(post => ({
+          ...post,
+          showFullReview: false
+        }));
+      } catch (error) {
+        console.error('Error fetching posts:', error);
+        if (error.response) {
+          console.error('Response status:', error.response.status);
+          console.error('Response data:', error.response.data);
+          this.error = `Failed to fetch posts. Server responded with ${error.response.status}.`;
+        } else if (error.request) {
+          console.error('No response received:', error.request);
+          this.error = 'Failed to fetch posts. No response received from server.';
+        } else {
+          console.error('Error setting up the request:', error.message);
+          this.error = 'Failed to fetch posts. Error setting up the request.';
+        }
+      } finally {
+        this.loading = false;
       }
-    } finally {
-      this.loading = false;
-    }
-  },
+    },
     async fetchTopBooks() {
       try {
         const response = await axios.get('http://localhost:8000/books/all');
-        this.topBooks = response.data.slice(0, 10); // Adjust slice to get top 10 books
+        this.topBooks = response.data.slice(3, 13); // Adjust slice to get top 10 books
       } catch (error) {
         console.error('Error fetching top books:', error);
       }
     },
     toggleReview(post) {
-      if (post.review.length > 300) {
-        post.showFullReview = !post.showFullReview;
-      }
+      post.showFullReview = !post.showFullReview;
     },
     loadUserAvatar() {
       const savedAvatar = localStorage.getItem('photoUrl');
@@ -152,7 +142,7 @@ export default {
       localStorage.removeItem('userEmail');
       localStorage.removeItem('userPassword');
       localStorage.removeItem('fullname');
-      localStorage.removeItem('userAvatar');
+      localStorage.removeItem('photoUrl');
       
       this.$router.push('/users/login');
       this.showUserMenu = false;
@@ -160,6 +150,7 @@ export default {
   }
 };
 </script>
+
 
 <style scoped>
 .home-page {
@@ -258,7 +249,7 @@ header {
 }
 .posts-section {
   display: flex;
-  flex-direction: column;
+  flex-direction: column-reverse;
   gap: 30px;
 }
 .post {
