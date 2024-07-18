@@ -26,61 +26,79 @@
           <button type="submit">Update Post</button>
         </form>
       </div>
-    </div>
-  </template>
-  
-  <script>
-  import axios from 'axios';
-  
-  export default {
-    name: 'PostEdit',
-    data() {
-      return {
-        post: {
-          id: null,
-          review: '',
-          book: {
-            title: '',
-            authorName: '',
-            bookType: '',
-            photoUrl: '',
-          }
-        }
-      }
-    },
-    created() {
-      this.fetchPost();
-    },
-    methods: {
-      async fetchPost() {
-        try {
-          const id = this.$route.params.id;
-          const response = await axios.get(`http://localhost:8000/posts/${id}`);
-          this.post = response.data;
-        } catch (error) {
-          console.error('Error fetching post:', error);
-        }
-      },
-      async updatePost() {
-        try {
-          await axios.put(`http://localhost:8000/posts/edit-post`, {
-            "bookTitle": this.post.book.title,
-            "bookReview": this.post.review,
-            "bookType": this.post.book.bookType,
-            "authorName": this.post.book.authorName,
-            "bookPhotoUrl": this.post.book.photoUrl,
-            "userId": localStorage.getItem("userId"),
-            "postId":this.post.id
-          });
-          alert('Post updated successfully!');
-          this.$router.push('/profile');
-        } catch (error) {
-          alert('An error occurred while updating the post.');
+      <transition name="fade">
+      <div v-if="message" class="alert" :class="{ 'alert-success': isSuccess, 'alert-error': !isSuccess }">
+        {{ message }}
+      </div>
+    </transition> 
+  </div>
+</template>
+
+<script>
+import axios from 'axios';
+
+export default {
+  name: 'PostEdit',
+  data() {
+    return {
+      isSuccess: false,
+      message: '',
+      post: {
+        id: null,
+        review: '',
+        book: {
+          title: '',
+          authorName: '',
+          bookType: '',
+          photoUrl: '',
         }
       }
     }
+  },
+  created() {
+    this.fetchPost();
+  },
+  methods: {
+    async fetchPost() {
+      try {
+        const id = this.$route.params.id;
+        const response = await axios.get(`http://localhost:8000/posts/${id}`);
+        this.post = response.data;
+      } catch (error) {
+        this.showError('Error fetching post: ' + (error.response?.data?.message || error.message));
+      }
+    },
+    async updatePost() {
+      try {
+         await axios.put(`http://localhost:8000/posts/edit-post`, {
+          "bookTitle": this.post.book.title,
+          "bookReview": this.post.review,
+          "bookType": this.post.book.bookType,
+          "authorName": this.post.book.authorName,
+          "bookPhotoUrl": this.post.book.photoUrl,
+          "userId": localStorage.getItem("userId"),
+          "postId": this.post.id
+        });
+        this.showSuccess('Post updated successfully!');
+        setTimeout(() => this.$router.push('/profile'), 2000);
+      } catch (error) {
+        this.showError('Error updating post: ' + (error.response?.data?.message || error.message));
+      }
+    },
+    showSuccess(msg) {
+      this.isSuccess = true;
+      this.message = msg;
+      setTimeout(() => this.message = '', 5000);
+    },
+    showError(msg) {
+      this.isSuccess = false;
+      this.message = msg;
+      setTimeout(() => this.message = '', 5000);
+    }
   }
-  </script>
+}
+</script>
+
   
   <style scoped>
   .whole-page {
@@ -88,7 +106,9 @@
     justify-content: center;
     align-items: flex-start;
     padding: 1rem;
-    background-color: #6F4E37;
+    background-image: url('@/assets/bookBackground.jpeg');
+    background-size: cover;
+    background-position: center;
     min-height: 100vh;
   }
   
@@ -101,7 +121,39 @@
     border-radius: 10px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
-  
+  .alert {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 15px 20px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  max-width: 80%;
+  text-align: center;
+}
+
+.alert-success {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.alert-error {
+  background-color: #f44336;
+  color: white;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.5s, transform 0.5s;
+}
+
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+  transform: translateY(-20px) translateX(-50%);
+}
   h2 {
     color: #131212;
     margin-bottom: 20px;

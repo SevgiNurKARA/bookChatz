@@ -321,6 +321,10 @@ header {
   object-fit: cover;
   margin-right: 10px;
 }
+.top-book-cover:hover{
+  transform: scale(1.2);
+  background-color: #003664;
+}
 
 .top-book-info {
   flex-grow: 1;
@@ -346,6 +350,10 @@ header {
   height: 150px;
   object-fit: cover;
   margin-right: 20px;
+}
+
+.book-cover:hover{
+  transform: scale(1.2);
 }
 
 .book-info p {
