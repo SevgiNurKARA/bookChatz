@@ -48,11 +48,16 @@
       </div>
       <div class="preview-actions">
         <button @click="showPreview = false" class="btn edit-btn">Edit Post</button>
-        <button @click="submitPost" class="btn submit-btn">Submit Post</button>
+        <button @click="submitPost" class="btn submit-btn" :disabled="loading">
+            {{ loading ? 'Submitting...' : 'Submit Post' }}
+        </button>
       </div>
     </div>
-
-    <p v-if="message" :class="['message', messageType]">{{ message }}</p>
+    <transition name="fade">
+        <div v-if="message" class="alert" :class="{ 'alert-success': isSuccess, 'alert-error': !isSuccess }">
+            {{ message }}
+        </div>
+    </transition> 
   </div>
 </template>
 
@@ -62,6 +67,8 @@ import axios from 'axios';
 export default {
   data() {
     return {
+      isSuccess: false,
+      loading: false,
       post: {
         bookTitle: '',
         bookType: '',
@@ -93,24 +100,31 @@ export default {
       }
     },
     async submitPost() {
+  this.loading = true;
+  this.message = '';
   try {
-    console.log('Sending post data:', this.post);  // Gönderilen veriyi logla
+    console.log('Sending post data:', this.post);
     const response = await axios.post('http://localhost:8000/posts/new-post', this.post);
-    console.log('Post başarıyla gönderildi:', response.data);
+    console.log(response.data);
+    this.isSuccess = true;
     this.message = 'Post successfully submitted!';
-    this.messageType = 'success';
+    setTimeout(() => {
+      this.$router.push('/');
+    }, 2000);
     this.resetForm();
   } catch (error) {
-    console.error('Post gönderilirken hata oluştu:', error);
+    this.isSuccess = false;
+    console.error('Error submitting post:', error);
     if (error.response) {
       console.error('Error data:', error.response.data);
       this.message = `Server error: ${error.response.status} - ${error.response.data.error || 'Unknown error'}`;
     } else if (error.request) {
-      this.message = 'No response received from server';
+      this.message = 'No response received from server. Please try again.';
     } else {
-      this.message = 'Error setting up the request';
+      this.message = 'Error setting up the request. Please try again.';
     }
-    this.messageType = 'error';
+  } finally {
+    this.loading = false;
   }
 },
     resetForm() {
@@ -147,6 +161,40 @@ body, html {
   justify-content: center;
   align-items: center;
   padding: 20px;
+}
+
+.alert {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 15px 20px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  max-width: 80%;
+  text-align: center;
+}
+
+.alert-success {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.alert-error {
+  background-color: #f44336;
+  color: white;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.5s, transform 0.5s;
+}
+
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+  transform: translateY(-20px) translateX(-50%);
 }
 
 form, .post-preview {
@@ -192,7 +240,7 @@ textarea {
 
 .btn {
   width: 100%;
-  padding: 10px;
+  padding: 0;
   background-color: #2d7ee7;
   color: white;
   border: none;
@@ -246,11 +294,13 @@ textarea {
 }
 
 .edit-btn {
-  background-color: #f0ad4e;
+  background-color: #e6921d;
+  padding: 0;
 }
 
 .submit-btn {
   background-color: #5cb85c;
+  padding: 0;
 }
 
 /* Responsive adjustments */
