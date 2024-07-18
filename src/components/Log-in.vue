@@ -14,12 +14,14 @@
         <button class="btn" type="submit" :disabled="isLoading">
           {{ isLoading ? 'Logging in...' : 'Login' }}
         </button>
-        <router-link to="/users/register">Create new account</router-link>
-        <p v-if="message" :class="{ 'error-message': isError, 'success-message': !isError }">
-          {{ message }}
-        </p>          
+        <router-link to="/users/register" style="color: white;">Create new account</router-link>        
       </form>
     </div>
+    <transition name="fade">
+      <div v-if="message" class="alert" :class="{ 'alert-success': isSuccess, 'alert-error': !isSuccess }">
+        {{ message }}
+      </div>
+    </transition>
   </div>   
 </template>
 
@@ -29,6 +31,7 @@ import axios from 'axios';
 export default {
   data() {
     return {
+      isSuccess: false,
       form: {
         email: '',
         password: ''
@@ -42,13 +45,14 @@ export default {
     async login() {
   this.isLoading = true;
   this.message = '';
-  this.isError = false;
+ 
 
   console.log('Attempting login with:', this.form);
 
   try {
     const response = await axios.post('http://localhost:8000/users/login', this.form);
-    console.log('Full login response:', response);
+    this.message = 'Login is successful! ' + response.data.message;
+    this.isSuccess = true;    
 
     if (response.data && response.data.userId) {
       // Token yerine userId'yi kontrol ediyoruz
@@ -61,12 +65,12 @@ export default {
       console.log('Login successful, user data received');
       setTimeout(() => this.$router.push('/'), 1500);
     } else {
-      this.isError = true;
+      this.isSuccess = false;
       this.message = 'Login failed: User data not received';
       console.error('Login response does not contain user data:', response.data);
     }
   } catch (error) {
-    this.isError = true;
+    this.isSuccess = false;
     console.error('Login error:', error);
     
     if (error.response) {
@@ -96,7 +100,7 @@ body, html {
   }
   
   #login-page {
-    height: 100%;
+    height: 718px;
     width: 100%;
     background-image: url('@/assets/bookBackground.jpeg');
     background-size: cover;
@@ -104,7 +108,7 @@ body, html {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 650px;
+
   }
   .login {
     width: 400px;
@@ -144,14 +148,42 @@ body, html {
     border-radius: 20px;
     line-height: 40px;
   }
-  
-  .error-message {
-    color: red;
-  }
-  .success-message {
-    color: green;
-  }
-  
+ 
+  .alert {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 15px 20px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  max-width: 80%;
+  text-align: center;
+}
+
+.alert-success {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.alert-error {
+  background-color: #f44336;
+  color: white;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.5s, transform 0.5s;
+}
+
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+  transform: translateY(-20px) translateX(-50%);
+}
+
+
   .btn {
     height: 40px;
     margin: 10px 0;
@@ -163,6 +195,7 @@ body, html {
     line-height: 40px;
     cursor: pointer;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    padding: 1px;
   }
   
 

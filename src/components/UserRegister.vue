@@ -6,7 +6,6 @@
           <label for="email">E-mail: </label>
           <input id="email" type="email" v-model="form.email" required />
         </div>
-
         <div class="reg">
           <label for="password">Password: </label>
           <input id="password" v-model="form.password" type="password" required />
@@ -35,7 +34,11 @@
         </button>
       </form>
     </div>
-    <p v-if="message">{{ message }}</p>
+    <transition name="fade">
+      <div v-if="message" class="alert" :class="{ 'alert-success': isSuccess, 'alert-error': !isSuccess }">
+        {{ message }}
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -45,6 +48,7 @@ import axios from 'axios';
 export default {
   data() {
     return {
+      isSuccess: false,
       avatars: [
         { src: 'https://t3.ftcdn.net/jpg/02/81/81/42/240_F_281814220_xSqihBCVEluoKEjWLH8iq9sYPs1A3ojr.jpg', alt: 'Avatar 1' },
         { src: 'https://t4.ftcdn.net/jpg/03/25/30/09/240_F_325300900_ZrBgMXBB4d0znXaut99id8sAtXtDU7ht.jpg', alt: 'Avatar 2' },
@@ -112,8 +116,9 @@ async submitForm() {
       }
 
       try {
-    const response = await axios.post('http://localhost:8000/users/register', this.form);
-    this.message = 'Registration successful! ' + response.data.message;
+        const response = await axios.post('http://localhost:8000/users/register', this.form);
+        this.message = 'Registration successful! ' + response.data.message;
+        this.isSuccess = true;
     
     // Kullanıcı bilgilerini localStorage'a kaydet
     localStorage.setItem('userEmail', this.form.email);
@@ -125,6 +130,7 @@ async submitForm() {
       this.$router.push('/');
     }, 2000);
   } catch (error) {
+    this.isSuccess = false;
     if (error.response) {
       switch(error.response.status) {
         case 409:
@@ -157,7 +163,7 @@ body, html {
 }
 
 #register-page {
-  height: 100%;
+  height: 724px;
   width: 100%;
   background-image: url('@/assets/bookBackground.jpeg');
   background-size: cover;
@@ -238,6 +244,40 @@ input[type="email"], input[type="password"], input[type="text"] {
   border: 3px solid #007BFF;
 }
 
+.alert {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 15px 20px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  max-width: 80%;
+  text-align: center;
+}
+
+.alert-success {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.alert-error {
+  background-color: #f44336;
+  color: white;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.5s, transform 0.5s;
+}
+
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+  transform: translateY(-20px) translateX(-50%);
+}
+
 .btn {
   height: 40px;
   margin: 10px 0;
@@ -247,6 +287,7 @@ input[type="email"], input[type="password"], input[type="text"] {
   border: 1px solid rgb(0, 0, 0);
   border-radius: 40px;
   line-height: 40px;
+  padding:1px;
   cursor: pointer;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
 }
