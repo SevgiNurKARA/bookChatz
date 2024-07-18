@@ -175,15 +175,18 @@ header {
   align-items: center;
 }
 
-.about-us {
-  width: 1500px;
-  height: 650px;
-  margin: 0 auto;
-  padding: 20px;
-  font-family: Arial, sans-serif;
-  line-height: 1.6;
-  color: #333;
-  background-color: #BC8B68;
+.about {
+  background-color: #2975A7;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 25px;
+  border: 1px solid #070101;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.about:hover {
+  background-color: #003664;
 }
 .create-post-btn {
   margin-right: 20px;
@@ -204,6 +207,11 @@ header {
 
 .create-post-btn:hover {
   background-color: #1c6ad4;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 25px;
 }
 
 

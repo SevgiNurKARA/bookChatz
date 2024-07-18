@@ -44,7 +44,7 @@
             name: 'Veysel ÖZDEMİR',
             role: 'Computer Engineering',
             specialization: 'Backend Developer',
-            linkedin: 'https://www.linkedin.com/in/veysel-ozdemir',
+            linkedin: 'https://www.linkedin.com/in/ozdemir-veysel/',
             github: 'https://github.com/veysel-ozdemir',
             email: 'veysel2002tr@gmail.com'
           },
