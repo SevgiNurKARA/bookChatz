@@ -130,7 +130,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 
 #landing-page {
   font-family: Arial, sans-serif;
@@ -189,7 +189,7 @@ nav button {
   border-radius: 25px;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  background-color: #2975A7;
+  background-color:  #2975A7;
 }
 
 nav button:hover {
@@ -431,5 +431,4 @@ footer {
   }
   
 }
-
 </style>
