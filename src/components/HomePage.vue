@@ -68,7 +68,6 @@
 
 <script>
 import axios from 'axios';
-import '@/components/Homepage.css';
 
 export default {
   name: 'HomePage',
