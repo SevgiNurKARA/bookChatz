@@ -3,6 +3,7 @@
     <header>
       <div class="logo">
         <img src="@/assets/bookChatz.jpg" alt="Logo">
+        <div class="about" @click="$router.push('/about-us')">About Us</div>
       </div>
       <nav>
         <button @click="$router.push('/users/login')">Sign In</button>
@@ -130,6 +131,7 @@ export default {
 </script>
 
 <style scoped>
+
 #landing-page {
   font-family: Arial, sans-serif;
   width: 1200;
@@ -150,10 +152,30 @@ header {
   margin-bottom: 30px;
 }
 
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+}
+
 .logo img {
-  height: 75px;
-  width: 75px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
+}
+
+.about {
+  background-color: #2975A7;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 25px;
+  border: 1px solid #070101;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.about:hover {
+  background-color: #003664;
 }
 
 nav {
@@ -162,15 +184,17 @@ nav {
 }
 
 nav button {
-  background-color: #007bff;
-  color: white;
-  border: none;
   padding: 10px 20px;
-  font-size: 16px;
+  border: none;
+  border-radius: 25px;
   cursor: pointer;
-  border-radius: 50px;
+  transition: background-color 0.3s ease;
+  background-color:  #2975A7;
 }
 
+nav button:hover {
+  background-color: #003664;
+}
 main {
   text-align: center;
   width: 100%;
@@ -407,5 +431,4 @@ footer {
   }
   
 }
-
 </style>
