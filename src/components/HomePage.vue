@@ -24,12 +24,12 @@
       <div class="posts-section">
         <p v-if="loading">Loading posts...</p>
         <p v-if="error">{{ error }}</p>
-        <div class="post" v-for="post in posts" :key="post.id">
+        <div class="post" v-for="post in paginatedPosts" :key="post.id">
           <div class="post-header">
             <span class="date">{{ post.postDate }}</span>
             <span class="user-name">{{ post.userFullname }}</span>
           </div>
-          <div class="post-content">
+           <div class="post-content">
             <h2>{{ post.bookName }}</h2>
             <div class="book-info">
               <img :src="post.bookPhotoUrl" alt="Book Cover" class="book-cover">
@@ -63,6 +63,21 @@
   </ul>
 </div>
     </main>
+    <footer class="pagination">
+  <button @click="changePage(1)" :disabled="currentPage === 1">|&lt;</button>
+  <button @click="changePage(currentPage - 1)" :disabled="currentPage === 1">&lt;</button>
+  <button 
+    v-for="page in totalPages" 
+    :key="page" 
+    @click="changePage(page)"
+    :class="{ active: currentPage === page }"
+  >
+    {{ page }}
+  </button>
+  <button @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages">&gt;</button>
+  <button @click="changePage(totalPages)" :disabled="currentPage === totalPages">&gt;|</button>
+    </footer>
+      
   </div>
 </template>
 
@@ -73,6 +88,8 @@ export default {
   name: 'HomePage',
   data() {
     return {
+      currentPage: 1,
+      postsPerPage: 3,
       userAvatar: '',
       showUserMenu: false,
       posts: [],
@@ -87,16 +104,72 @@ export default {
     this.fetchPosts();
     this.fetchTopBooks();
   },
+  computed: {
+  paginatedPosts() {
+    const start = (this.currentPage - 1) * this.postsPerPage;
+    const end = start + this.postsPerPage;
+    return this.posts.slice(start, end);
+  },
+  totalPages() {
+    return Math.ceil(this.posts.length / this.postsPerPage);
+  }
+},
   methods: {
+    getPageNumbers() {
+    const totalPages = this.totalPages;
+    const current = this.currentPage;
+    const delta = 2;
+    const range = [];
+    const rangeWithDots = [];
+    let l;
+
+    for (let i = 1; i <= totalPages; i++) {
+      if (i === 1 || i === totalPages || (i >= current - delta && i <= current + delta)) {
+        range.push(i);
+      }
+    }
+
+    for (let i of range) {
+      if (l) {
+        if (i - l === 2) {
+          rangeWithDots.push(l + 1);
+        } else if (i - l !== 1) {
+          rangeWithDots.push('...');
+        }
+      }
+      rangeWithDots.push(i);
+      l = i;
+    }
+
+    return rangeWithDots;
+  },
+  changePage(page) {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+    }
+  },
+  previousPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+    }
+  },
+  nextPage() {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+    }
+  },
     async fetchPosts() {
       this.loading = true;
       this.error = null;
       try {
         const response = await axios.get('http://localhost:8000/posts/all');
-        this.posts = response.data.map(post => ({
+        this.posts = response.data
+        .map(post => ({
           ...post,
           showFullReview: false
-        }));
+        }))
+        .sort((a, b) => new Date(b.postDate) - new Date(a.postDate));
+
       } catch (error) {
         console.error('Error fetching posts:', error);
         if (error.response) {
@@ -267,8 +340,9 @@ header {
 }
 .posts-section {
   display: flex;
-  flex-direction: column-reverse;
+  flex-direction: column;
   gap: 30px;
+  justify-content: flex-start;
 }
 .post {
   width: 100%;
@@ -295,6 +369,38 @@ header {
   color: #1c1e21;
   
 }
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.pagination button {
+  background-color: #fff;
+  color: #333;
+  border: 1px solid #ddd;
+  padding: 5px 10px;
+  margin: 0 2px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.pagination button:hover:not(:disabled) {
+  background-color: #f0f0f0;
+}
+
+.pagination button.active {
+  background-color: #3498db;
+  color: white;
+  border-color: #3498db;
+}
+
+.pagination button:disabled {
+  color: #ccc;
+  cursor: not-allowed;
+} 
 .top-books-section {
   width: 25%;
   padding: 20px;
