@@ -221,12 +221,13 @@ export default {
       this.$router.push('/posts/new-post');
     },
     logout() {
-      localStorage.removeItem('userEmail');
-      localStorage.removeItem('userPassword');
+      localStorage.removeItem('userId');
+      localStorage.removeItem('email');
+      localStorage.removeItem('password');
       localStorage.removeItem('fullname');
       localStorage.removeItem('photoUrl');
       
-      this.$router.push('/');
+      this.$router.push('/landing');
       this.showUserMenu = false;
     }
   }

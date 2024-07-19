@@ -40,7 +40,6 @@
             <p><strong>Author:</strong> {{ post.bookAuthorName }}</p>
             <p><strong>Type:</strong> {{ post.bookType }}</p>
             <img v-if="post.bookPhotoUrl" :src="post.bookPhotoUrl" alt="Book Cover" class="book-cover">
-            <p><strong>Review:</strong> {{ post.review }}</p>
             <p :class="{ 'collapsed': !post.showFullReview && post.review.length > 300 }">
             {{ post.showFullReview || post.review.length <= 300 ? post.review : post.review.slice(0, 300) + '...' }}
           </p>
