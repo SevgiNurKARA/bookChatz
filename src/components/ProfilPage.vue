@@ -27,6 +27,7 @@
               <input id="password" v-model="user.password" type="password">
             </div>
             <button type="submit">Update Profile</button>
+            <p> {{ message }}</p>
           </form>
           <button @click="confirmDeleteAccount" class="delete-account-btn">Delete Account</button>
         </div>
@@ -47,6 +48,11 @@
         </div>
       </div>      
     </div>
+    <transition name="fade">
+      <div v-if="message" class="alert" :class="{ 'alert-success': isSuccess, 'alert-error': !isSuccess }">
+        {{ message }}
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -58,12 +64,14 @@ export default {
   data() {
     return {
       userPosts: [] ,
+      message: '',
+    isSuccess: false,
       user: {
-        id: '',
+        userId: localStorage.getItem('userId'),
         fullname: '',
         email: '',
         photoUrl: '',
-        password: ''
+        password: localStorage.getItem('password'),
       },
       showAvatarSelection: false,
       selectedAvatar: '',
@@ -103,27 +111,62 @@ export default {
   }
 },
     loadUserData() {
-      this.user.id = localStorage.getItem('userId') || '';
+      this.user.userId = localStorage.getItem('userId') || '';
       this.user.fullname = localStorage.getItem('fullname') || '';
       this.user.email = localStorage.getItem('email') || '';
       this.user.photoUrl = localStorage.getItem('photoUrl') || '';
     },
     selectAvatar(avatarSrc) {
       this.selectedAvatar = avatarSrc;
+      this.user.photoUrl =  this.selectedAvatar;
       this.showAvatarSelection = false;
     },
-    updateProfile() {
-      // Update user data in localStorage
-      localStorage.setItem('fullname', this.user.fullname);
-      localStorage.setItem('email', this.user.email);
-      localStorage.setItem('photoUrl', this.selectedAvatar || this.user.photoUrl);
+    async updateProfile() {
+  if (this.user.password && this.user.password.length < 8) {
+    this.message = "Password must be at least 8 characters long.";
+    this.isSuccess = false;
+    return;
+  }
 
-      if (this.user.password) {
-        localStorage.setItem('userPassword', this.user.password);
+  try {
+    const response = await axios.put("http://localhost:8000/users/edit-user", this.user);
+    
+    localStorage.setItem('fullname', response.data.fullname);
+    localStorage.setItem('email', response.data.email);
+    localStorage.setItem('photoUrl', response.data.photoUrl);
+    
+    if (this.user.password) {
+      localStorage.setItem('password', this.user.password);
+    }
+    
+    this.message = 'Profile updated successfully!';
+    this.isSuccess = true;
+    
+    // Kısa bir süre sonra ana sayfaya yönlendir
+    setTimeout(() => {
+      this.$router.push('/');
+    }, 2000);
+
+  } catch (error) {
+    this.isSuccess = false;
+    if (error.response) {
+      switch(error.response.status) {
+        case 409:
+          this.message = error.response.data;
+          break;
+        case 400:
+          this.message = "Invalid data submitted. Please check your inputs.";
+          break;
+        default:
+          this.message = 'Update failed: ' + (error.response.data.message || 'Unknown error');
       }
-      alert('Profile updated successfully!');
-      this.$router.push('/'); // Redirect to home page after update
-    },
+    } else if (error.request) {
+      this.message = 'No response received from the server. Please try again later.';
+    } else {
+      this.message = 'Error submitting form: ' + error.message;
+    }
+  }
+},
     confirmDeleteAccount() {
       if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
         this.deleteAccount();
@@ -132,7 +175,7 @@ export default {
     async deleteAccount() {
       try {
         
-        const response = await axios.delete(`http://localhost:8000/users/delete/${this.user.id}`);
+        const response = await axios.delete(`http://localhost:8000/users/delete/${this.user.userId}`);
         if (response.data === "User was deleted successfully") {
           alert('Your account has been successfully deleted.');
           // Kullanıcı oturumunu sonlandır ve local storage'ı temizle
@@ -143,7 +186,7 @@ export default {
           alert('An error occurred while deleting your account. Please try again.');
         }
       } catch (error) {
-        if (error.response && error.response.data === `User not found with id: ${this.user.id}`) {
+        if (error.response && error.response.data === `User not found with id: ${this.user.userId}`) {
           alert('User not found. Please check your account details.');
         } else {
           alert('An error occurred while deleting your account. Please try again.');
@@ -159,6 +202,7 @@ export default {
         try {
           await axios.delete(`http://localhost:8000/posts/delete/${postId}`);
           this.userPosts = this.userPosts.filter(post => post.id !== postId);
+          this.$router.push('/');
         } catch (error) {
           console.error('Error deleting post:', error);
           alert('An error occurred while deleting the post.');
@@ -252,6 +296,39 @@ button {
   cursor: pointer;
   width: 100%;
   margin-bottom: 10px;
+}
+.alert {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 15px 20px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  max-width: 80%;
+  text-align: center;
+}
+
+.alert-success {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.alert-error {
+  background-color: #f44336;
+  color: white;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.5s, transform 0.5s;
+}
+
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+  transform: translateY(-20px) translateX(-50%);
 }
 
 button:hover {
