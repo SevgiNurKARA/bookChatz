@@ -10,12 +10,12 @@
           <label for="password">Password: </label>
           <input id="password" v-model="form.password" type="password" required />
         </div>
-        
+
         <div class="reg">
           <label for="fullname">Full Name: </label>
           <input id="fullname" v-model="form.fullname" type="text" required />
         </div>
-        
+
         <div class="reg">
           <label>Select your avatar: </label>
           <div class="avatar-options">
@@ -28,7 +28,7 @@
             <img :src="selectedAvatar.src" :alt="selectedAvatar.alt" />
           </div>
         </div>
-        <button class="btn" type="submit" >
+        <button class="btn" type="submit">
           Register
         </button>
         <router-link to="/users/login" style="color: white;">Already have an account?</router-link>
@@ -66,39 +66,39 @@ export default {
   },
 
   methods: {
-     
-  selectAvatar(index) {
-    this.selectedAvatar = this.avatars[index];
-    let sourceUrl = this.avatars[index].src;
-    localStorage.setItem('photoUrl', sourceUrl);
-    this.form.photoUrl = sourceUrl;
-  },
-  
-  register() {
-  if (!this.form.email || !this.form.password || !this.form.fullname || !this.selectedAvatar) {
-    this.message = "All fields are required.";
-    return;
-  }
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(this.form.email)) {
-    this.message = "Please enter a valid email address.";
-    return;
-  }
+    selectAvatar(index) {
+      this.selectedAvatar = this.avatars[index];
+      let sourceUrl = this.avatars[index].src;
+      localStorage.setItem('photoUrl', sourceUrl);
+      this.form.photoUrl = sourceUrl;
+    },
 
-  if (this.form.password.length < 8) {
-    this.message = "Password must be at least 8 characters long.";
-    return;
-  }
+    register() {
+      if (!this.form.email || !this.form.password || !this.form.fullname || !this.selectedAvatar) {
+        this.message = "All fields are required.";
+        return;
+      }
 
-  // Here you would typically make an API call to register the user
-  // For now, we'll just simulate success
-  this.message = "Registration successful!";
-  setTimeout(() => {
-    this.$router.push('/');
-  }, 2000);
-},
-async submitForm() {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(this.form.email)) {
+        this.message = "Please enter a valid email address.";
+        return;
+      }
+
+      if (this.form.password.length < 8) {
+        this.message = "Password must be at least 8 characters long.";
+        return;
+      }
+
+      // Here you would typically make an API call to register the user
+      // For now, we'll just simulate success
+      this.message = "Registration successful!";
+      setTimeout(() => {
+        this.$router.push('/');
+      }, 2000);
+    },
+    async submitForm() {
       if (!this.form.email || !this.form.password || !this.form.fullname || !this.selectedAvatar) {
         this.message = "All fields are required.";
         return;
@@ -119,45 +119,46 @@ async submitForm() {
         const response = await axios.post('http://localhost:8000/users/register', this.form);
         this.message = 'Registration successful! ' + response.data.message;
         this.isSuccess = true;
-    
-    // Kullanıcı bilgilerini localStorage'a kaydet
-    localStorage.setItem('email', this.form.email);
-    localStorage.setItem('fullname', this.form.fullname);
-    localStorage.setItem('photoUrl', this.form.photoUrl);
-    localStorage.setItem('userId', response.data.userId);
-    localStorage.setItem('password', this.form.password);
-    
-    // Kısa bir gecikme sonrası ana sayfaya yönlendir
-    setTimeout(() => {
-      this.$router.push('/');
-    }, 2000);
-  } catch (error) {
-    this.isSuccess = false;
-    if (error.response) {
-      switch(error.response.status) {
-        case 409:
-          this.message = "This email is already registered. Please use a different email.";
-          break;
-        case 400:
-          this.message = "Invalid data submitted. Please check your inputs.";
-          break;
-        default:
-          this.message = 'Registration failed: ' + (error.response.data.message || 'Unknown error');
+
+        // Kullanıcı bilgilerini localStorage'a kaydet
+        localStorage.setItem('email', this.form.email);
+        localStorage.setItem('fullname', this.form.fullname);
+        localStorage.setItem('photoUrl', this.form.photoUrl);
+        localStorage.setItem('userId', response.data.userId);
+        localStorage.setItem('password', this.form.password);
+
+        // Kısa bir gecikme sonrası ana sayfaya yönlendir
+        setTimeout(() => {
+          this.$router.push('/');
+        }, 2000);
+      } catch (error) {
+        this.isSuccess = false;
+        if (error.response) {
+          switch (error.response.status) {
+            case 409:
+              this.message = "This email is already registered. Please use a different email.";
+              break;
+            case 400:
+              this.message = "Invalid data submitted. Please check your inputs.";
+              break;
+            default:
+              this.message = 'Registration failed: ' + (error.response.data.message || 'Unknown error');
+          }
+        } else if (error.request) {
+          this.message = 'No response received from the server. Please try again later.';
+        } else {
+          this.message = 'Error submitting form: ' + error.message;
+        }
       }
-    } else if (error.request) {
-      this.message = 'No response received from the server. Please try again later.';
-    } else {
-      this.message = 'Error submitting form: ' + error.message;
-    }
-  }
     },
   }
-   
-  };
+
+};
 </script>
 
 <style>
-body, html {
+body,
+html {
   margin: 0;
   padding: 0;
   height: 100%;
@@ -165,7 +166,7 @@ body, html {
 }
 
 #register-page {
-  height: 724px;
+  min-height: 100vh;
   width: 100%;
   background-image: url('@/assets/bookBackground.jpeg');
   background-size: cover;
@@ -202,7 +203,9 @@ label {
   padding-left: 10px;
 }
 
-input[type="email"], input[type="password"], input[type="text"] {
+input[type="email"],
+input[type="password"],
+input[type="text"] {
   height: 40px;
   padding: 0 20px;
   margin-bottom: 20px;
@@ -271,11 +274,13 @@ input[type="email"], input[type="password"], input[type="text"] {
   color: white;
 }
 
-.fade-enter-active, .fade-leave-active {
+.fade-enter-active,
+.fade-leave-active {
   transition: opacity 0.5s, transform 0.5s;
 }
 
-.fade-enter, .fade-leave-to {
+.fade-enter,
+.fade-leave-to {
   opacity: 0;
   transform: translateY(-20px) translateX(-50%);
 }
@@ -289,7 +294,7 @@ input[type="email"], input[type="password"], input[type="text"] {
   border: 1px solid rgb(0, 0, 0);
   border-radius: 40px;
   line-height: 40px;
-  padding:1px;
+  padding: 1px;
   cursor: pointer;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
 }
