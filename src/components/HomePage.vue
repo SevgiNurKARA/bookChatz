@@ -168,7 +168,15 @@ export default {
           ...post,
           showFullReview: false
         }))
-        .sort((a, b) => new Date(b.postDate) - new Date(a.postDate));
+        .sort((a, b) => {
+        const dateA = new Date(a.postDate);
+        const dateB = new Date(b.postDate);
+        if (dateA.toDateString() !== dateB.toDateString()) {
+          return dateB - dateA; // Tarihleri karşılaştır
+        } else {
+          return b.postId - a.postId; // Tarihler aynıysa postId'ye göre sırala
+        }
+      });
 
       } catch (error) {
         console.error('Error fetching posts:', error);
@@ -218,7 +226,7 @@ export default {
       localStorage.removeItem('fullname');
       localStorage.removeItem('photoUrl');
       
-      this.$router.push('/users/login');
+      this.$router.push('/');
       this.showUserMenu = false;
     }
   }
