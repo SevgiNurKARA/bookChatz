@@ -1,8 +1,8 @@
 <template>
   <div class="whole-page">
     <div class="profile-page">
-      <h1>User Profile</h1>
       <div class="profile-content">
+        <h1>User Profile</h1>
         <div class="avatar-section">
           <img :src="selectedAvatar || user.photoUrl" alt="User Avatar" class="current-avatar">
           <button @click="showAvatarSelection = !showAvatarSelection">Change Avatar</button>
@@ -41,6 +41,12 @@
             <p><strong>Type:</strong> {{ post.bookType }}</p>
             <img v-if="post.bookPhotoUrl" :src="post.bookPhotoUrl" alt="Book Cover" class="book-cover">
             <p><strong>Review:</strong> {{ post.review }}</p>
+            <p :class="{ 'collapsed': !post.showFullReview && post.review.length > 300 }">
+            {{ post.showFullReview || post.review.length <= 300 ? post.review : post.review.slice(0, 300) + '...' }}
+          </p>
+          <span class="read-more-btn" v-if="post.review.length > 300" @click="toggleReview(post)" >
+            {{ post.showFullReview ? 'Show less' : 'Show more' }}
+          </span>
             <button @click="editPost(post.postId)">Edit</button>
             <button @click="deletePost(post.postId)">Delete</button>
         </div>
@@ -90,6 +96,9 @@ export default {
 },
 
   methods: {
+    toggleReview(post) {
+      post.showFullReview = !post.showFullReview;
+    },
     async loadUserPosts() {
   try {
     const userId = localStorage.getItem('userId');
@@ -254,6 +263,13 @@ export default {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   font-family: Arial, sans-serif;
 }
+.profile-content h1{
+  text-align: center;
+}
+
+.profile-content{  
+  margin-right: 50px;
+}
 
 .left-section {
   flex: 3;
@@ -274,27 +290,53 @@ export default {
 .avatar-section {
   text-align: center;
   margin-bottom: 20px;
-  border-radius: 10px;
+  border-radius: 50%;
+  
+}
+.avatar-selection {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 20px;
+  gap: 10px;
+  justify-content: center;
 }
 
-.current-avatar {
-  width: 150px;
-  height: 150px;
+.avatar-option {
+  cursor: pointer;
+}
+
+.avatar-option img {
+  width: 75px;
+  height: 75px;
   object-fit: cover;
   border-radius: 50%;
-  margin-bottom: 15px;
-  border: 3px solid #ddd;
+  border: 2px solid whitesmoke;
+}
+
+.avatar-section current-avatar {
+  width: 150px;
+  height: 150px;
+  padding-top: 50px;
+  object-fit: cover;
+  border-radius: 75%;
+  
+}
+
+.current-avatar{
+  width: 150px;
+  height: 150px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  object-fit: cover;
+  border-radius: 75%;
+  border: 3px solid whitesmoke;
 }
 
 /* Form styles */
 .form-group {
   margin-bottom: 15px;
 }
-.img {
-  height: 50px;
-  width: 50px;
-  border-radius: 50%;
-}
+
 label {
   display: block;
   margin-bottom: 5px;
@@ -354,6 +396,20 @@ button {
   opacity: 0;
   transform: translateY(-20px) translateX(-50%);
 }
+button read-more-btn {
+  background: none;
+  border: none;
+  color: #1877f2;
+  cursor: pointer;
+  font-weight: bold;
+  padding: 5px 0;
+  margin-top: 10px;
+}
+
+button read-more-btn:hover {
+  text-decoration: underline;
+}
+
 
 button:hover {
   background-color: #45a049;
