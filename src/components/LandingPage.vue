@@ -17,10 +17,9 @@
       <div v-if="loading">Loading...</div>
       <div v-else-if="error">{{ error }}</div>
       <div v-else>
-        <div class="posts-slider" v-if="posts.length > 0">
-          <button @click="prevSlide" class="slider-btn prev">&lt;</button>
-          <div class="posts-container" :style="{ transform: `translateX(${-currentIndex * 100}%)` }">
-            <div class="post" v-for="post in posts" :key="post.id">
+        <div class="posts-carousel" v-if="posts.length > 0">
+          <div class="posts-container">
+            <div class="post" v-for="(post, index) in posts" :key="post.id" :style="slideStyle(index)">
               <img :src="post.bookPhotoUrl" :alt="post.bookTitle" class="book-cover">
               <div class="post-content">
                 <h3>{{ post.bookTitle }}</h3>
@@ -31,7 +30,6 @@
               </div>
             </div>
           </div>
-          <button @click="nextSlide" class="slider-btn next">&gt;</button>
         </div>
         
         <section class="top-ten-books" v-if="topBooks.length > 0">
@@ -69,9 +67,31 @@ export default {
       posts: [],
       loading: false,
       error: null,
+      autoSlideInterval: null,
     };
   },
   methods: {
+    prevSlide() {
+      this.currentIndex = (this.currentIndex - 1 + this.posts.length) % this.posts.length;
+    },
+    nextSlide() {
+      this.currentIndex = (this.currentIndex + 1) % this.posts.length;
+    },
+    slideStyle(index) {
+      const offset = (index - this.currentIndex + this.posts.length) % this.posts.length;
+      return {
+        transform: `translateX(${offset * 100}%)`,
+        transition: 'transform 0.5s ease-in-out',
+      };
+    },
+    startAutoSlide() {
+      this.autoSlideInterval = setInterval(() => {
+        this.nextSlide();
+      }, 5000); // Change slide every 5 seconds
+    },
+    stopAutoSlide() {
+      clearInterval(this.autoSlideInterval);
+    },
     async fetchPosts() {
       this.loading = true;
       this.error = null;
@@ -112,26 +132,21 @@ export default {
       if (!text) return ''; 
       return text.length > length ? text.slice(0, length) + '...' : text;
     },
-    prevSlide() {
-      if (this.currentIndex > 0) {
-        this.currentIndex--;
-      }
-    },
-    nextSlide() {
-      if (this.currentIndex < this.posts.length - 1) {
-        this.currentIndex++;
-      }
-    },
   },
   created() {
     this.fetchPosts();
     this.fetchTopBooks();
-  }
+  },
+   mounted() {
+    this.startAutoSlide();
+  },
+  beforeUnmount() {
+    this.stopAutoSlide();
+  },
 };
 </script>
 
 <style scoped>
-
 #landing-page {
   font-family: Arial, sans-serif;
   width: 1200;
@@ -231,10 +246,11 @@ main {
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
 }
 
-.posts-slider {
+.posts-carousel {
   position: relative;
   width: 100%;
   max-width: 800px;
+  height: 300px; /* Adjust based on your needs */
   margin: 40px auto;
   overflow: hidden;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -243,7 +259,8 @@ main {
 
 .posts-container {
   display: flex;
-  transition: transform 0.5s ease-in-out;
+  height: 100%;
+  width: 100%;
 }
 
 .post {
@@ -252,6 +269,9 @@ main {
   padding: 20px;
   background-color: #ffffff;
   box-sizing: border-box;
+  position: absolute;
+  width: 100%;
+  height: 100%;
 }
 
 .book-cover {
@@ -261,6 +281,7 @@ main {
   border-radius: 5px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease;
+  border: 1px thick double black;
 }
 
 .book-cover:hover {
@@ -272,6 +293,8 @@ main {
   padding-left: 20px;
   display: flex;
   flex-direction: column;
+  border-radius: 25px;
+  
 }
 
 .post-content h3 {
@@ -292,6 +315,7 @@ main {
   line-height: 1.6;
   color: #444;
   flex-grow: 1;
+  text-align: left;
 }
 
 .post-content .date {
@@ -299,37 +323,7 @@ main {
   color: #888;
   text-align: right;
   margin-top: auto;
-}
-
-.slider-btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background-color: rgba(0, 0, 0, 0.5);
-  color: white;
-  border: none;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  font-size: 18px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
-}
-
-.slider-btn:hover {
-  background-color: rgba(0, 0, 0, 0.7);
-}
-
-.slider-btn.prev {
-  left: 10px;
-}
-
-.slider-btn.next {
-  right: 10px;
+  margin-right: 10px;
 }
 
 
@@ -400,27 +394,8 @@ footer {
   font-size: 0.8em;
   color: #666;
 }
+ 
 
-.slider-btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background-color: rgba(0, 0, 0, 0.5);
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  font-size: 18px;
-  cursor: pointer;
-  z-index: 10;
-}
-
-.prev {
-  left: 10px;
-}
-
-.next {
-  right: 10px;
-}
 @media (max-width: 768px) {
   .top-books-grid {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
