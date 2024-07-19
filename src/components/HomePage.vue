@@ -385,6 +385,8 @@ header {
   margin: 0 2px;
   cursor: pointer;
   font-size: 14px;
+  border-radius: 5px;
+
 }
 
 .pagination button:hover:not(:disabled) {

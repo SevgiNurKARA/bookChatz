@@ -60,6 +60,7 @@ export default {
       localStorage.setItem('fullname', response.data.fullname);
       localStorage.setItem('photoUrl', response.data.photoUrl);
       localStorage.setItem('email', response.data.email);
+      localStorage.setItem('password', this.form.password);
       
       this.message = 'Login successful!';
       console.log('Login successful, user data received');

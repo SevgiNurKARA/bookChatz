@@ -125,6 +125,7 @@ async submitForm() {
     localStorage.setItem('fullname', this.form.fullname);
     localStorage.setItem('photoUrl', this.form.photoUrl);
     localStorage.setItem('userId', response.data.userId);
+    localStorage.setItem('password', this.form.password);
     
     // Kısa bir gecikme sonrası ana sayfaya yönlendir
     setTimeout(() => {
