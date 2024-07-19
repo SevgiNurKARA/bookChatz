@@ -70,7 +70,7 @@ export default {
   selectAvatar(index) {
     this.selectedAvatar = this.avatars[index];
     let sourceUrl = this.avatars[index].src;
-    localStorage.setItem('userAvatar', sourceUrl);
+    localStorage.setItem('photoUrl', sourceUrl);
     this.form.photoUrl = sourceUrl;
   },
   
@@ -121,9 +121,10 @@ async submitForm() {
         this.isSuccess = true;
     
     // Kullanıcı bilgilerini localStorage'a kaydet
-    localStorage.setItem('userEmail', this.form.email);
+    localStorage.setItem('email', this.form.email);
     localStorage.setItem('fullname', this.form.fullname);
-    localStorage.setItem('userAvatar', this.form.photoUrl);
+    localStorage.setItem('photoUrl', this.form.photoUrl);
+    localStorage.setItem('userId', response.data.userId);
     
     // Kısa bir gecikme sonrası ana sayfaya yönlendir
     setTimeout(() => {
