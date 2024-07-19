@@ -27,7 +27,6 @@
               <input id="password" v-model="user.password" type="password">
             </div>
             <button type="submit">Update Profile</button>
-            <p> {{ message }}</p>
           </form>
           <button @click="confirmDeleteAccount" class="delete-account-btn">Delete Account</button>
         </div>
@@ -122,11 +121,8 @@ export default {
       this.showAvatarSelection = false;
     },
     async updateProfile() {
-  if (this.user.password && this.user.password.length < 8) {
-    this.message = "Password must be at least 8 characters long.";
-    this.isSuccess = false;
-    return;
-  }
+      this.message = '';
+ 
 
   try {
     const response = await axios.put("http://localhost:8000/users/edit-user", this.user);
@@ -137,6 +133,11 @@ export default {
     
     if (this.user.password) {
       localStorage.setItem('password', this.user.password);
+      if (this.user.password && this.user.password.length < 8) {
+    this.message = "Password must be at least 8 characters long.";
+    this.isSuccess = false;
+    return;
+  }
     }
     
     this.message = 'Profile updated successfully!';
@@ -255,6 +256,7 @@ export default {
 .avatar-section {
   text-align: center;
   margin-bottom: 20px;
+  border-radius: 10px;
 }
 
 .current-avatar {
@@ -270,7 +272,11 @@ export default {
 .form-group {
   margin-bottom: 15px;
 }
-
+.img {
+  height: 50px;
+  width: 50px;
+  border-radius: 50%;
+}
 label {
   display: block;
   margin-bottom: 5px;
