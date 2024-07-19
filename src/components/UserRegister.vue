@@ -28,10 +28,10 @@
             <img :src="selectedAvatar.src" :alt="selectedAvatar.alt" />
           </div>
         </div>
-        
         <button class="btn" type="submit" >
           Register
         </button>
+        <router-link to="/users/login" style="color: white;">Already have an account?</router-link>
       </form>
     </div>
     <transition name="fade">
