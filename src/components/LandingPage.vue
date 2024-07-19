@@ -100,7 +100,7 @@ export default {
       this.error = null;
       try {
         const response = await axios.get('http://localhost:8000/books/all');
-        this.topBooks = response.data.slice(0, 10);
+        this.topBooks = response.data.slice(3, 13);
       } catch (error) {
         console.error('Error fetching top books:', error);
         this.error = 'Failed to fetch top books. Please try again later.';

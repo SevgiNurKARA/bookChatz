@@ -176,40 +176,58 @@ export default {
     async deleteAccount() {
       try {
         
+        this.isSuccess = true;
         const response = await axios.delete(`http://localhost:8000/users/delete/${this.user.userId}`);
-        if (response.data === "User was deleted successfully") {
-          alert('Your account has been successfully deleted.');
-          // Kullanıcı oturumunu sonlandır ve local storage'ı temizle
-          localStorage.clear();
-          // Ana sayfaya yönlendir
-          this.$router.push('/landing');
-        } else {
-          alert('An error occurred while deleting your account. Please try again.');
-        }
+        this.message = response.data;
+        // Mesajı göstermek için bir süre bekleyelim
+      setTimeout(() => {
+        this.message = ''; // Mesajı temizle
+        localStorage.clear();
+        this.$router.push('/landing'); // Ana sayfaya yönlendir
+      }, 2000); // 2 saniye sonra yönlendir
       } catch (error) {
+        this.isSuccess = false;
         if (error.response && error.response.data === `User not found with id: ${this.user.userId}`) {
-          alert('User not found. Please check your account details.');
+          this.message='User not found. Please check your account details.';
+
         } else {
-          alert('An error occurred while deleting your account. Please try again.');
+          this.message='An error occurred while deleting your account. Please try again.';
         }
-        console.error('Error deleting account:', error);
+        
+         // Hata mesajını da bir süre gösterelim
+      setTimeout(() => {
+        this.message = '';
+      }, 3000);
       }
     },
     editPost(postId) {
     this.$router.push({ name: 'PostEdit', params: { id: postId } });
+    this.message='Post updated successfully';
   },
-    async deletePost(postId) {
-      if (confirm('Are you sure you want to delete this post?')) {
-        try {
-          await axios.delete(`http://localhost:8000/posts/delete/${postId}`);
-          this.userPosts = this.userPosts.filter(post => post.id !== postId);
-          this.$router.push('/');
-        } catch (error) {
-          console.error('Error deleting post:', error);
-          alert('An error occurred while deleting the post.');
-        }
-      }
+  async deletePost(postId) {
+  if (confirm('Are you sure you want to delete this post?')) {
+    try {
+      await axios.delete(`http://localhost:8000/posts/delete/${postId}`);
+      this.message = 'Post deleted successfully';
+      this.isSuccess = true;
+      this.userPosts = this.userPosts.filter(post => post.id !== postId);
+      
+      // Mesajı göstermek için bir süre bekleyelim
+      setTimeout(() => {
+        this.message = ''; // Mesajı temizle
+        this.$router.push('/'); // Ana sayfaya yönlendir
+      }, 2000); // 2 saniye sonra yönlendir
+    } catch (error) {
+      this.message = 'An error occurred while deleting the post.';
+      this.isSuccess = false;
+      
+      // Hata mesajını da bir süre gösterelim
+      setTimeout(() => {
+        this.message = '';
+      }, 3000);
     }
+  }
+},
   }
 };
 </script>
